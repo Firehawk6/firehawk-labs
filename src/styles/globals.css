@@ -1,0 +1,43 @@
+:root {
+  --background: #070908;
+  --panel: #0d1210;
+  --panel-hover: #121a16;
+  --border: #203028;
+  --text: #e4eee8;
+  --muted: #7d9185;
+  --green: #6dff9b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--background);
+  background-size: 48px 48px;
+  color: var(--text);
+  font-family: "Courier New", Courier, monospace;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--green);
+  color: var(--background);
+}

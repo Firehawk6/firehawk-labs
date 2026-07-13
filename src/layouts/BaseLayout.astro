@@ -1,0 +1,49 @@
+---
+import "../styles/globals.css";
+import BackgroundScene from "../components/BackgroundScene.astro";
+import BootScreen from "../components/BootScreen.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = "Projects, experiments, infrastructure, and strange ideas from Firehawk Labs.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#070908" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>{title}</title>
+  </head>
+
+  <body>
+    <BackgroundScene />
+    <BootScreen />
+
+    <div class="page-content">
+      <slot />
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  body.booting {
+    overflow: hidden;
+  }
+
+  .page-content {
+    position: relative;
+    z-index: 2;
+  }
+</style>
