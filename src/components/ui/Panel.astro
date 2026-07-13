@@ -1,0 +1,55 @@
+---
+interface Props {
+  title: string;
+  meta?: string;
+  padded?: boolean;
+}
+
+const {
+  title,
+  meta,
+  padded = true,
+} = Astro.props;
+---
+
+<section class="panel">
+  <header class="panel-header">
+    <span>{title}</span>
+
+    {meta && <span>{meta}</span>}
+  </header>
+
+  <div class:list={["panel-content", { padded }]}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: rgba(13, 18, 16, 0.8);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+  }
+
+  .panel-header {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
+
+  .panel-header span:last-child {
+    color: var(--green);
+  }
+
+  .panel-content.padded {
+    padding: 24px;
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+interface Props {
+  label?: string;
+  status?: "online" | "warning" | "offline";
+  pulse?: boolean;
+}
+
+const {
+  label = "ONLINE",
+  status = "online",
+  pulse = true,
+} = Astro.props;
+---
+
+<span class:list={["status", status, { pulse }]}>
+  <i aria-hidden="true"></i>
+  <span>{label}</span>
+</span>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--muted);
+    font-size: 0.67rem;
+    letter-spacing: 0.12em;
+  }
+
+  .status i {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+  }
+
+  .online i {
+    background: var(--green);
+    box-shadow: 0 0 14px var(--green);
+  }
+
+  .warning i {
+    background: #ffbf5f;
+    box-shadow: 0 0 14px #ffbf5f;
+  }
+
+  .offline i {
+    background: #ff5f6d;
+    box-shadow: 0 0 14px #ff5f6d;
+  }
+
+  .pulse i {
+    animation: status-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes status-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.55;
+      transform: scale(0.8);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse i {
+      animation: none;
+    }
+  }
+</style>
