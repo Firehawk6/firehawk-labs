@@ -3,120 +3,275 @@
 </div>
 
 <script>
-  import * as THREE from "three";
-
   const canvas = document.querySelector("#background-canvas");
 
   if (canvas instanceof HTMLCanvasElement) {
-    const scene = new THREE.Scene();
-
-    const camera = new THREE.PerspectiveCamera(
-      55,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      100
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
     );
 
-    camera.position.set(0, 5.5, 10);
-    camera.rotation.x = -0.45;
+    if (reduceMotion.matches) {
+      canvas.hidden = true;
+    } else {
+      let disposed = false;
+      let cleanup = () => {};
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: true,
-      powerPreference: "high-performance",
-    });
+      const initializeScene = async () => {
+        try {
+          const {
+            BufferAttribute,
+            BufferGeometry,
+            Clock,
+            GridHelper,
+            PerspectiveCamera,
+            Points,
+            PointsMaterial,
+            Scene,
+            WebGLRenderer,
+          } = await import("three");
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
+          if (disposed) return;
 
-    const grid = new THREE.GridHelper(
-      45,
-      45,
-      0x6dff9b,
-      0x203028
-    );
+          const scene = new Scene();
 
-    grid.material.transparent = true;
-    grid.material.opacity = 0.16;
+          const camera = new PerspectiveCamera(
+            55,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            100
+          );
 
-    scene.add(grid);
+          camera.position.set(0, 5.5, 10);
+          camera.rotation.x = -0.45;
 
-    const particleGeometry = new THREE.BufferGeometry();
-    const particleCount = 140;
-    const positions = new Float32Array(particleCount * 3);
+          const renderer = new WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            powerPreference: "high-performance",
+          });
 
-    for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 32;
-      positions[i * 3 + 1] = Math.random() * 12 - 1;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 32;
-    }
+          renderer.setPixelRatio(
+            Math.min(window.devicePixelRatio, 1.5)
+          );
 
-    particleGeometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(positions, 3)
-    );
+          renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+          );
 
-    const particleMaterial = new THREE.PointsMaterial({
-      color: 0x6dff9b,
-      size: 0.035,
-      transparent: true,
-      opacity: 0.4,
-      sizeAttenuation: true,
-    });
+          const grid = new GridHelper(
+            45,
+            45,
+            0x6dff9b,
+            0x203028
+          );
 
-    const particles = new THREE.Points(
-      particleGeometry,
-      particleMaterial
-    );
+          const gridMaterials = Array.isArray(grid.material)
+            ? grid.material
+            : [grid.material];
 
-    scene.add(particles);
+          for (const material of gridMaterials) {
+            material.transparent = true;
+            material.opacity = 0.14;
+          }
 
-    const mouse = {
-      x: 0,
-      y: 0,
-    };
+          scene.add(grid);
 
-    const target = {
-      x: 0,
-      y: 0,
-    };
+          const particleGeometry = new BufferGeometry();
+          const particleCount = 140;
+          const positions = new Float32Array(
+            particleCount * 3
+          );
 
-    window.addEventListener("mousemove", (event) => {
-      target.x = (event.clientX / window.innerWidth - 0.5) * 0.8;
-      target.y = (event.clientY / window.innerHeight - 0.5) * 0.35;
-    });
+          for (
+            let index = 0;
+            index < particleCount;
+            index++
+          ) {
+            positions[index * 3] =
+              (Math.random() - 0.5) * 32;
 
-    const clock = new THREE.Clock();
+            positions[index * 3 + 1] =
+              Math.random() * 12 - 1;
 
-    const animate = () => {
-      const elapsed = clock.getElapsedTime();
+            positions[index * 3 + 2] =
+              (Math.random() - 0.5) * 32;
+          }
 
-      mouse.x += (target.x - mouse.x) * 0.025;
-      mouse.y += (target.y - mouse.y) * 0.025;
+          particleGeometry.setAttribute(
+            "position",
+            new BufferAttribute(positions, 3)
+          );
 
-      camera.position.x = mouse.x;
-      camera.position.y = 5.5 - mouse.y;
+          const particleMaterial = new PointsMaterial({
+            color: 0x6dff9b,
+            size: 0.035,
+            transparent: true,
+            opacity: 0.4,
+            sizeAttenuation: true,
+          });
 
-      grid.position.z = (elapsed * 0.35) % 1;
-      particles.rotation.y = elapsed * 0.015;
-      particles.position.y = Math.sin(elapsed * 0.25) * 0.15;
+          const particles = new Points(
+            particleGeometry,
+            particleMaterial
+          );
 
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
+          scene.add(particles);
 
-    animate();
+          const currentMouse = {
+            x: 0,
+            y: 0,
+          };
 
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+          const targetMouse = {
+            x: 0,
+            y: 0,
+          };
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, 1.5)
+          const handleMouseMove = (event: MouseEvent) => {
+            targetMouse.x =
+              (event.clientX / window.innerWidth - 0.5) *
+              0.8;
+
+            targetMouse.y =
+              (event.clientY / window.innerHeight - 0.5) *
+              0.35;
+          };
+
+          const handleResize = () => {
+            camera.aspect =
+              window.innerWidth / window.innerHeight;
+
+            camera.updateProjectionMatrix();
+
+            renderer.setPixelRatio(
+              Math.min(window.devicePixelRatio, 1.5)
+            );
+
+            renderer.setSize(
+              window.innerWidth,
+              window.innerHeight
+            );
+          };
+
+          window.addEventListener(
+            "mousemove",
+            handleMouseMove,
+            { passive: true }
+          );
+
+          window.addEventListener(
+            "resize",
+            handleResize,
+            { passive: true }
+          );
+
+          const clock = new Clock();
+
+          let animationFrame = 0;
+          let running = true;
+
+          const renderFrame = () => {
+            if (!running) return;
+
+            const elapsed = clock.getElapsedTime();
+
+            currentMouse.x +=
+              (targetMouse.x - currentMouse.x) * 0.025;
+
+            currentMouse.y +=
+              (targetMouse.y - currentMouse.y) * 0.025;
+
+            camera.position.x = currentMouse.x;
+            camera.position.y = 5.5 - currentMouse.y;
+
+            grid.position.z = (elapsed * 0.35) % 1;
+            particles.rotation.y = elapsed * 0.015;
+
+            particles.position.y =
+              Math.sin(elapsed * 0.25) * 0.15;
+
+            renderer.render(scene, camera);
+
+            animationFrame =
+              window.requestAnimationFrame(renderFrame);
+          };
+
+          const handleVisibilityChange = () => {
+            if (document.hidden) {
+              running = false;
+
+              window.cancelAnimationFrame(
+                animationFrame
+              );
+            } else if (!running) {
+              running = true;
+              clock.start();
+              renderFrame();
+            }
+          };
+
+          document.addEventListener(
+            "visibilitychange",
+            handleVisibilityChange
+          );
+
+          renderFrame();
+
+          cleanup = () => {
+            running = false;
+
+            window.cancelAnimationFrame(animationFrame);
+
+            window.removeEventListener(
+              "mousemove",
+              handleMouseMove
+            );
+
+            window.removeEventListener(
+              "resize",
+              handleResize
+            );
+
+            document.removeEventListener(
+              "visibilitychange",
+              handleVisibilityChange
+            );
+
+            particleGeometry.dispose();
+            particleMaterial.dispose();
+
+            for (const material of gridMaterials) {
+              material.dispose();
+            }
+
+            renderer.dispose();
+          };
+        } catch (error) {
+          console.error(
+            "Unable to initialize background scene:",
+            error
+          );
+
+          canvas.hidden = true;
+        }
+      };
+
+      const startTimer = window.setTimeout(() => {
+        void initializeScene();
+      }, 0);
+
+      window.addEventListener(
+        "pagehide",
+        () => {
+          disposed = true;
+          window.clearTimeout(startTimer);
+          cleanup();
+        },
+        { once: true }
       );
-    });
+    }
   }
 </script>
 
@@ -155,7 +310,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     #background-canvas {
-      opacity: 0.25;
+      display: none;
     }
   }
 </style>

@@ -1,40 +1,24 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import DesktopLauncher from "../components/DesktopLauncher.astro";
+import TopBar from "../components/home/TopBar.astro";
+import Panel from "../components/ui/Panel.astro";
+import Window from "../components/ui/Window.astro";
 import { projects } from "../data/projects";
+
+const getWindowStatus = (
+  status: "online" | "development" | "archived"
+): "online" | "warning" | "offline" => {
+  if (status === "online") return "online";
+  if (status === "archived") return "offline";
+
+  return "warning";
+};
 ---
 
 <BaseLayout title="Firehawk Labs">
   <div class="system-shell">
-    <header class="topbar">
-      <a class="brand" href="/">
-        <span class="brand-mark">F6</span>
-
-        <span>
-          <strong>FIREHAWK LABS</strong>
-          <small>REMOTE SYSTEM INTERFACE</small>
-        </span>
-      </a>
-
-      <nav>
-        <a href="#projects">PROJECTS</a>
-        <a href="/experiments">EXPERIMENTS</a>
-        <a href="/terminal">TERMINAL</a>
-
-        <a
-          href="https://github.com/Firehawk6"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GITHUB ↗
-        </a>
-      </nav>
-
-      <div class="system-status">
-        <span class="status-light"></span>
-        ONLINE
-      </div>
-    </header>
+    <TopBar />
 
     <main>
       <section class="hero">
@@ -65,45 +49,50 @@ import { projects } from "../data/projects";
         </div>
 
         <aside class="system-panel">
-          <div class="panel-header">
-            <span>SYSTEM OVERVIEW</span>
-            <span>LIVE</span>
-          </div>
+          <Panel
+            title="SYSTEM OVERVIEW"
+            meta="LIVE"
+            padded={false}
+          >
+            <dl class="system-overview">
+              <div>
+                <dt>HOST</dt>
+                <dd>FIREHAWK-LABS</dd>
+              </div>
 
-          <dl>
-            <div>
-              <dt>HOST</dt>
-              <dd>FIREHAWK-LABS</dd>
+              <div>
+                <dt>STATUS</dt>
+                <dd class="online">ONLINE</dd>
+              </div>
+
+              <div>
+                <dt>PROJECTS</dt>
+                <dd>{String(projects.length).padStart(2, "0")}</dd>
+              </div>
+
+              <div>
+                <dt>MODE</dt>
+                <dd>EXPERIMENTAL</dd>
+              </div>
+
+              <div>
+                <dt>UPLINK</dt>
+                <dd>SECURE</dd>
+              </div>
+            </dl>
+
+            <div class="activity">
+              <span>RECENT ACTIVITY</span>
+
+              <p>&gt; Interface initialized</p>
+              <p>&gt; Project archive mounted</p>
+              <p>&gt; GitHub uplink available</p>
+
+              <p class="cursor-line">
+                &gt; Awaiting input<span>_</span>
+              </p>
             </div>
-
-            <div>
-              <dt>STATUS</dt>
-              <dd class="online">ONLINE</dd>
-            </div>
-
-            <div>
-              <dt>PROJECTS</dt>
-              <dd>{String(projects.length).padStart(2, "0")}</dd>
-            </div>
-
-            <div>
-              <dt>MODE</dt>
-              <dd>EXPERIMENTAL</dd>
-            </div>
-
-            <div>
-              <dt>UPLINK</dt>
-              <dd>SECURE</dd>
-            </div>
-          </dl>
-
-          <div class="activity">
-            <span>RECENT ACTIVITY</span>
-            <p>&gt; Interface initialized</p>
-            <p>&gt; Project archive mounted</p>
-            <p>&gt; GitHub uplink available</p>
-            <p class="cursor-line">&gt; Awaiting input<span>_</span></p>
-          </div>
+          </Panel>
         </aside>
       </section>
 
@@ -125,41 +114,36 @@ import { projects } from "../data/projects";
           {
             projects.map((project, index) => (
               <a
-                class="project-window"
+                class="project-link"
                 href={`/projects/${project.slug}`}
+                aria-label={`Open ${project.title}`}
               >
-                <div class="window-bar">
-                  <span>
-                    PROJECT_{String(index + 1).padStart(3, "0")}
-                  </span>
+                <Window
+                  title={`PROJECT_${String(index + 1).padStart(3, "0")}`}
+                  status={getWindowStatus(project.status)}
+                >
+                  <div class="project-content">
+                    <div class="project-index">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
 
-                  <div class="window-controls">
-                    <i></i>
-                    <i></i>
-                    <i></i>
+                    <p class="category">{project.category}</p>
+
+                    <h3>{project.title}</h3>
+
+                    <p class="description">
+                      {project.description}
+                    </p>
+
+                    <div class="project-meta">
+                      <span>
+                        STATUS: {project.status.toUpperCase()}
+                      </span>
+
+                      <span>OPEN NODE ↗</span>
+                    </div>
                   </div>
-                </div>
-
-                <div class="window-content">
-                  <div class="project-index">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-
-                  <p class="category">{project.category}</p>
-                  <h3>{project.title}</h3>
-
-                  <p class="description">
-                    {project.description}
-                  </p>
-
-                  <div class="project-meta">
-                    <span>
-                      STATUS: {project.status.toUpperCase()}
-                    </span>
-
-                    <span>OPEN NODE ↗</span>
-                  </div>
-                </div>
+                </Window>
               </a>
             ))
           }
@@ -228,7 +212,7 @@ import { projects } from "../data/projects";
         y: 24,
       });
 
-      gsap.set(".project-window", {
+      gsap.set(".project-link", {
         opacity: 0,
         y: 36,
         scale: 0.98,
@@ -300,7 +284,7 @@ import { projects } from "../data/projects";
           "-=0.25"
         )
         .to(
-          ".project-window",
+          ".project-link",
           {
             opacity: 1,
             y: 0,
@@ -335,90 +319,6 @@ import { projects } from "../data/projects";
     z-index: 2;
     width: min(1440px, calc(100% - 48px));
     margin: 0 auto;
-  }
-
-  .topbar {
-    position: sticky;
-    z-index: 20;
-    top: 0;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    min-height: 86px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(7, 9, 8, 0.84);
-    backdrop-filter: blur(16px);
-  }
-
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    width: fit-content;
-    text-decoration: none;
-  }
-
-  .brand-mark {
-    display: grid;
-    width: 42px;
-    height: 42px;
-    place-items: center;
-    border: 1px solid var(--green);
-    color: var(--green);
-    font-weight: 700;
-    box-shadow: inset 0 0 18px rgba(109, 255, 155, 0.06);
-  }
-
-  .brand strong,
-  .brand small {
-    display: block;
-  }
-
-  .brand strong {
-    color: var(--text);
-    font-size: 0.8rem;
-    letter-spacing: 0.16em;
-  }
-
-  .brand small {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
-  }
-
-  nav {
-    display: flex;
-    gap: 30px;
-  }
-
-  nav a {
-    color: var(--muted);
-    font-size: 0.69rem;
-    letter-spacing: 0.12em;
-    text-decoration: none;
-    transition: color 180ms ease;
-  }
-
-  nav a:hover {
-    color: var(--green);
-  }
-
-  .system-status {
-    justify-self: end;
-    color: var(--muted);
-    font-size: 0.67rem;
-    letter-spacing: 0.12em;
-  }
-
-  .status-light {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-right: 9px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 14px var(--green);
   }
 
   .hero {
@@ -505,52 +405,37 @@ import { projects } from "../data/projects";
   }
 
   .system-panel {
-    border: 1px solid var(--border);
-    background: rgba(13, 18, 16, 0.8);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+    min-width: 0;
   }
 
-  .panel-header,
-  .window-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 42px;
-    padding: 0 16px;
-    border-bottom: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
-  }
-
-  .system-panel dl {
+  .system-overview {
     margin: 0;
     padding: 10px 18px;
   }
 
-  .system-panel dl div {
+  .system-overview div {
     display: flex;
     justify-content: space-between;
     padding: 15px 0;
     border-bottom: 1px solid rgba(32, 48, 40, 0.7);
   }
 
-  .system-panel dt,
-  .system-panel dd {
+  .system-overview dt,
+  .system-overview dd {
     margin: 0;
     font-size: 0.7rem;
     letter-spacing: 0.1em;
   }
 
-  .system-panel dt {
+  .system-overview dt {
     color: var(--muted);
   }
 
-  .system-panel dd {
+  .system-overview dd {
     color: var(--text);
   }
 
-  .system-panel .online {
+  .system-overview .online {
     color: var(--green);
   }
 
@@ -606,53 +491,28 @@ import { projects } from "../data/projects";
     gap: 18px;
   }
 
-  .project-window {
+  .project-link {
     display: block;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: rgba(13, 18, 16, 0.76);
+    color: inherit;
     text-decoration: none;
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2);
-    transition:
-      transform 220ms ease,
-      border-color 220ms ease,
-      background 220ms ease;
   }
 
-  .project-window:hover {
-    transform: translateY(-8px);
-    border-color: rgba(109, 255, 155, 0.65);
-    background: var(--panel-hover);
-  }
-
-  .window-controls {
-    display: flex;
-    gap: 6px;
-  }
-
-  .window-controls i {
-    width: 6px;
-    height: 6px;
-    border: 1px solid var(--muted);
-    border-radius: 50%;
-  }
-
-  .window-content {
+  .project-content {
     position: relative;
-    min-height: 340px;
-    padding: 34px;
+    min-height: 270px;
   }
 
   .project-index {
     position: absolute;
-    top: 26px;
-    right: 30px;
+    top: -8px;
+    right: 0;
     color: rgba(109, 255, 155, 0.12);
     font-size: 5rem;
     font-weight: 700;
+    line-height: 1;
   }
 
-  .window-content h3 {
+  .project-content h3 {
     position: relative;
     margin: 18px 0;
     font-size: clamp(2rem, 4vw, 3.6rem);
@@ -670,9 +530,9 @@ import { projects } from "../data/projects";
 
   .project-meta {
     position: absolute;
-    right: 34px;
-    bottom: 30px;
-    left: 34px;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     justify-content: space-between;
     gap: 20px;
@@ -728,14 +588,6 @@ import { projects } from "../data/projects";
   }
 
   @media (max-width: 980px) {
-    .topbar {
-      grid-template-columns: 1fr auto;
-    }
-
-    nav {
-      display: none;
-    }
-
     .hero {
       grid-template-columns: 1fr;
     }
@@ -748,11 +600,6 @@ import { projects } from "../data/projects";
   @media (max-width: 720px) {
     .system-shell {
       width: min(100% - 24px, 1440px);
-    }
-
-    .brand small,
-    .system-status {
-      display: none;
     }
 
     .hero {
@@ -776,6 +623,10 @@ import { projects } from "../data/projects";
     .project-meta,
     footer {
       flex-direction: column;
+    }
+
+    .project-content {
+      min-height: 310px;
     }
 
     .cursor-glow {
