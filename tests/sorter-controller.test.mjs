@@ -35,6 +35,11 @@ async function advance(count) {
     await Promise.resolve(); await Promise.resolve();
   }
 }
+await advance(300);
+assert.equal(runs.size, 0, 'Page load must not start sorting');
+assert.equal(element('sort-play').textContent, 'Play');
+assert.equal(element('sort-endless').checked, true);
+element('sort-play').onclick();
 await advance(1200);
 assert.ok(runs.size >= 3, 'Endless loop did not finish multiple verified runs');
 assert.equal(Number(element('sort-local').textContent), runs.size);

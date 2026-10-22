@@ -3,7 +3,7 @@
 Migrated from Firehawk6/Sorter at a59f72e35477f45a59f504c88326ade8b258e6f3.
 Public route: /projects/sorter. Original repository and hosting are untouched.
 
-The original uses quicksort with repeated partition scans and setTimeout per operation; it has no separate verification pass. The Labs version adds merge/insertion sorting, frame-budgeted steps, a 450 ms completion sweep, endless playback, pause, and resize without state loss. Reduced-motion users start paused. This remains a browser simulation, not server rendering.
+The original uses quicksort with repeated partition scans and setTimeout per operation; it has no separate verification pass. The Labs version adds merge/insertion sorting, frame-budgeted steps, a 450 ms completion sweep, endless playback, pause, and resize without state loss. All visitors start paused with Endless enabled; Play starts the loop. This remains a browser simulation, not server rendering.
 
 Completion requires the exact sorted permutation 1..N, not just ascending comparisons. Each completion increments the session count once and queues one UUID for the shared counter. Interrupted shuffles do not count. Endless cycles last at least 3.3 seconds of visible active time.
 

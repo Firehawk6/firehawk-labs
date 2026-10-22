@@ -8,7 +8,7 @@ function init() {
   const names = { quick: 'Quicksort', merge: 'Merge sort', insertion: 'Insertion sort' };
   let values, iterator, highlights = [], method, cycle = 0;
   let phase = 'sorting', phaseTime = 0, runTime = 0, local = 0, total = 0;
-  let running = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let running = false;
   let visible = true, frame = 0, last = 0, debt = 0, width = 0, height = 0, dpr = 1, dirty = true;
   let pending = [], sending = false;
   function status() {
