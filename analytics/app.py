@@ -18,6 +18,9 @@ def connect():
     db = sqlite3.connect(DATABASE, timeout=10)
     db.execute('PRAGMA journal_mode=WAL')
     db.executescript('''
+      CREATE TABLE IF NOT EXISTS sort_runs (day TEXT, run TEXT, PRIMARY KEY(day,run));
+      CREATE TABLE IF NOT EXISTS sort_totals (id INTEGER PRIMARY KEY CHECK(id=1), total INTEGER NOT NULL);
+      INSERT OR IGNORE INTO sort_totals VALUES(1,0);
       CREATE TABLE IF NOT EXISTS sessions (day TEXT, token TEXT, PRIMARY KEY(day,token));
       CREATE TABLE IF NOT EXISTS daily (day TEXT PRIMARY KEY, visits INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS countries (code TEXT PRIMARY KEY, visits INTEGER NOT NULL);
@@ -80,5 +83,43 @@ def visit():
             db.execute('DELETE FROM sessions WHERE day < ?',((now-timedelta(days=1)).isoformat(),))
             db.execute('DELETE FROM daily WHERE day < ?',((now-timedelta(days=400)).isoformat(),))
         return jsonify(recorded=added)
+    finally:
+        db.close()
+
+
+@app.get('/api/sorts')
+def sort_stats():
+    db = connect()
+    try:
+        return jsonify(total=db.execute('SELECT total FROM sort_totals WHERE id=1').fetchone()[0])
+    finally:
+        db.close()
+
+
+@app.post('/api/sorts/complete')
+def sort_complete():
+    # Browser-reported completions, not cryptographic proof of computation.
+    if not PUBLIC_ORIGIN or request.headers.get('Origin') != PUBLIC_ORIGIN:
+        return jsonify(error='Origin not allowed'), 403
+    if request.headers.get('Sec-Fetch-Site') not in (None, 'same-origin'):
+        return jsonify(error='Cross-site request'), 403
+    if not request.is_json:
+        return jsonify(error='JSON required'), 415
+    data = request.get_json(silent=True)
+    run = data.get('run') if isinstance(data, dict) else None
+    day = datetime.now(timezone.utc).date().isoformat()
+    if not isinstance(run, str) or not re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}', run, re.I):
+        return jsonify(error='Invalid run'), 400
+    if data.get('day') != day:
+        return jsonify(error='Completion date must be today in UTC'), 400
+    db = connect()
+    try:
+        with db:
+            added = db.execute('INSERT OR IGNORE INTO sort_runs VALUES(?,?)', (day, run.lower())).rowcount == 1
+            if added:
+                db.execute('UPDATE sort_totals SET total=total+1 WHERE id=1')
+            db.execute('DELETE FROM sort_runs WHERE day < ?', (day,))
+            total = db.execute('SELECT total FROM sort_totals WHERE id=1').fetchone()[0]
+        return jsonify(recorded=added, total=total)
     finally:
         db.close()

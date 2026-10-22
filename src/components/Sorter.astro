@@ -1,0 +1,20 @@
+<section id="sorter" aria-label="Sorting visualizer">
+  <header><span>SORTER / ENDLESS ORDER</span><span id="sort-state" role="status">Ready</span></header>
+  <div class="stage"><canvas id="sort-canvas" aria-label="Bars arranged by height during sorting">Enable canvas support to view the bars.</canvas></div>
+  <div class="controls">
+    <button id="sort-play" class="primary" disabled>Play</button>
+    <button id="sort-new" disabled>New shuffle</button>
+    <label>Algorithm<select id="sort-method"><option value="quick">Quicksort</option><option value="merge">Merge sort</option><option value="insertion">Insertion sort</option><option value="cycle">Cycle algorithms</option></select></label>
+    <label>Bars<select id="sort-count"><option>64</option><option selected>128</option><option>256</option><option>512</option></select></label>
+    <label>Pace<select id="sort-speed"><option value="200">Relaxed</option><option value="900" selected>Flow</option><option value="4000">Fast</option></select></label>
+    <label class="check"><input id="sort-endless" type="checkbox" checked /> Endless</label>
+  </div>
+  <dl><div><dt>Completed across the site</dt><dd id="sort-global">—</dd></div><div><dt>This session</dt><dd id="sort-local">0</dd></div><div><dt>Current algorithm</dt><dd id="sort-algorithm">Quicksort</dd></div></dl>
+  <p id="sort-network" role="status">Connecting to the shared counter…</p>
+  <noscript>Enable JavaScript to run the sorter.</noscript>
+</section>
+<p class="detail-copy">Shuffle, sort, verify, repeat. Each finish gets one quick sweep from left to right. Only a fully sorted set counts; changing the algorithm or bar count starts a fresh run. The animation rests while this tab is hidden or the canvas is offscreen.</p>
+<script>import '../scripts/sorter.js';</script>
+<style>
+section{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--panel)}header{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 22px;border-bottom:1px solid var(--border);color:var(--accent);font-size:.75rem;letter-spacing:.06em}.stage{height:clamp(300px,55vh,650px);background:#0b0b0d;padding:18px}canvas{display:block;width:100%;height:100%}.controls{display:flex;align-items:end;flex-wrap:wrap;gap:14px;padding:22px;border-top:1px solid var(--border)}label{display:flex;flex-direction:column;gap:8px;font-size:.75rem;color:var(--muted)}button,select{min-height:44px;border:1px solid #594046;border-radius:6px;padding:10px 14px;background:#211a1d;color:var(--text);font:inherit;font-size:.8rem}button{cursor:pointer}button:disabled{opacity:.5}button:hover{border-color:var(--accent)}.primary{background:var(--accent);color:#170d10;font-weight:bold}.check{flex-direction:row;align-items:center;min-height:44px}input{accent-color:var(--accent);width:18px;height:18px}dl{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:22px;margin:0;border-top:1px solid var(--border)}dt{color:var(--muted);font-size:.75rem}dd{margin:8px 0 0;font-size:clamp(1.2rem,2.5vw,2rem);font-variant-numeric:tabular-nums}#sort-network{margin:0;padding:0 22px 18px;color:var(--muted);font-size:.75rem}.detail-copy{margin-top:28px}@media(max-width:600px){dl{grid-template-columns:1fr 1fr}dl>div:last-child{grid-column:1/-1}.controls label:not(.check){flex:1 1 100px}}
+</style>
