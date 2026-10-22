@@ -11,4 +11,4 @@ import { projects } from "../../data/projects";
     </Panel>)}
   </div>
 </ContentLayout>
-<style>.projects { display:grid;gap:24px; } h2 { font-size:2rem;margin:0; }</style>
+<style>.projects { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px; } h2 { font-size:clamp(1.5rem,3vw,2rem);margin:0; }</style>

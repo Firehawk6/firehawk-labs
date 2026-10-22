@@ -54,7 +54,7 @@ const {
 
 .window:hover{
 
-    transform:translateY(-8px);
+    transform:translateY(-3px);
 
     border-color:rgba(109,255,155,.55);
 
@@ -68,6 +68,8 @@ const {
     display:flex;
     justify-content:space-between;
     align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
 
     padding:14px 18px;
 
@@ -109,7 +111,7 @@ const {
 
     color:var(--muted);
 
-    font-size:.68rem;
+    font-size:.72rem;
 
     letter-spacing:.12em;
 
@@ -117,7 +119,7 @@ const {
 
 .window-content{
 
-    padding:30px;
+    padding:clamp(20px,3vw,30px);
 
 }
 </style>

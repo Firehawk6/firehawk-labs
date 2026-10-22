@@ -4,7 +4,10 @@
   --panel-hover: #121a16;
   --border: #203028;
   --text: #e4eee8;
-  --muted: #7d9185;
+  --muted: #9aafa2;
+  --content-width: 1200px;
+  --gutter: clamp(18px, 4vw, 48px);
+  --section-space: clamp(48px, 7vw, 88px);
   --green: #6dff9b;
 }
 
@@ -43,3 +46,13 @@ textarea {
 }
 
 :focus-visible { outline:2px solid var(--green);outline-offset:5px; }
+
+body { line-height:1.5; }
+h1,h2,h3,p { overflow-wrap:break-word; }
+h1,h2,h3 { text-wrap:balance; }
+p { text-wrap:pretty; }
+a,button,input { -webkit-tap-highlight-color:transparent; }
+@media (prefers-reduced-motion:reduce) {
+ html { scroll-behavior:auto; }
+ *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; }
+}

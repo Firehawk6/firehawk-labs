@@ -5,11 +5,10 @@ import { navigation as apps } from "../data/navigation";
 <section class="desktop-launcher" aria-labelledby="desktop-title">
   <div class="desktop-heading">
     <div>
-      <p>&gt; DESKTOP READY</p>
-      <h2 id="desktop-title">EXPLORE FIREHAWK</h2>
+      <p>EXPLORE</p>
+      <h2 id="desktop-title">TAKE A LOOK AROUND</h2>
     </div>
 
-    <span>SELECT APPLICATION</span>
   </div>
 
   <div class="app-grid">
@@ -27,8 +26,7 @@ import { navigation as apps } from "../data/navigation";
           </div>
 
           <div class="app-status">
-            <i></i>
-            READY
+            OPEN ↗
           </div>
         </a>
       ))
@@ -37,165 +35,20 @@ import { navigation as apps } from "../data/navigation";
 </section>
 
 <style>
-  .desktop-launcher {
-    padding: 110px 0 40px;
-  }
 
-  .desktop-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 24px;
-    margin-bottom: 28px;
-  }
+.desktop-launcher { padding:30px 0 0;border-top:1px solid var(--border); }
+.desktop-heading { margin-bottom:24px; }
+.desktop-heading p { margin:0;color:var(--green);font-size:.75rem;letter-spacing:.1em; }
+.desktop-heading h2 { margin:8px 0 0;font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.2;letter-spacing:-.04em; }
+.app-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px; }
+.app-tile { display:flex;flex-direction:column;align-items:flex-start;gap:20px;min-width:0;padding:22px;border:1px solid var(--border);background:rgba(13,18,16,.82);text-decoration:none;transition:transform 160ms,border-color 160ms,background 160ms; }
+.app-tile:hover { transform:translateY(-3px);border-color:var(--green);background:var(--panel-hover); }
+.app-icon { display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);color:var(--green);font-size:1.05rem; }
+.app-copy strong,.app-copy span { display:block; }
+.app-copy strong { font-size:1rem;letter-spacing:-.025em; }
+.app-copy span { margin-top:6px;color:var(--muted);font:.9rem/1.5 Arial,Helvetica,sans-serif; }
+.app-status { margin-top:auto;color:var(--green);font-size:.7rem;letter-spacing:.08em; }
+@media(max-width:900px) { .app-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:420px) { .app-grid { grid-template-columns:1fr; } .app-tile { display:grid;grid-template-columns:38px 1fr;gap:12px 18px;align-items:center; } .app-status { grid-column:2; } }
 
-  .desktop-heading p,
-  .desktop-heading > span {
-    margin: 0;
-    color: var(--green);
-    font-size: 0.68rem;
-    letter-spacing: 0.13em;
-  }
-
-  .desktop-heading h2 {
-    margin: 10px 0 0;
-    font-size: clamp(2.4rem, 5vw, 5rem);
-    line-height: 0.9;
-    letter-spacing: -0.055em;
-  }
-
-  .desktop-heading > span {
-    color: var(--muted);
-  }
-
-  .app-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-  }
-
-  .app-tile {
-    position: relative;
-    min-height: 220px;
-    padding: 22px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(109, 255, 155, 0.025),
-        transparent 45%
-      ),
-      rgba(13, 18, 16, 0.78);
-    color: var(--text);
-    text-decoration: none;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-    transition:
-      transform 220ms ease,
-      border-color 220ms ease,
-      background 220ms ease;
-  }
-
-  .app-tile::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    transform: translateY(101%);
-    background: linear-gradient(
-      180deg,
-      transparent,
-      rgba(109, 255, 155, 0.08)
-    );
-    transition: transform 260ms ease;
-  }
-
-  .app-tile:hover {
-    transform: translateY(-8px);
-    border-color: rgba(109, 255, 155, 0.7);
-    background: var(--panel-hover);
-  }
-
-  .app-tile:hover::before {
-    transform: translateY(0);
-  }
-
-  .app-icon {
-    position: relative;
-    display: grid;
-    width: 58px;
-    height: 58px;
-    place-items: center;
-    border: 1px solid var(--green);
-    color: var(--green);
-    font-size: 1.15rem;
-    box-shadow:
-      inset 0 0 24px rgba(109, 255, 155, 0.06),
-      0 0 24px rgba(109, 255, 155, 0.05);
-  }
-
-  .app-copy {
-    position: absolute;
-    right: 22px;
-    bottom: 46px;
-    left: 22px;
-  }
-
-  .app-copy strong,
-  .app-copy span {
-    display: block;
-  }
-
-  .app-copy strong {
-    font-size: 1.3rem;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-  }
-
-  .app-copy span {
-    margin-top: 7px;
-    color: var(--muted);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.82rem;
-  }
-
-  .app-status {
-    position: absolute;
-    right: 22px;
-    bottom: 18px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--muted);
-    font-size: 0.58rem;
-    letter-spacing: 0.1em;
-  }
-
-  .app-status i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 10px var(--green);
-  }
-
-  @media (max-width: 1100px) {
-    .app-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 720px) {
-    .desktop-heading {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .app-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .app-tile {
-      min-height: 180px;
-    }
-  }
 </style>

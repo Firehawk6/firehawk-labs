@@ -72,8 +72,9 @@
     enterButton instanceof HTMLButtonElement &&
     ready instanceof HTMLElement
   ) {
-    const alreadyBooted =
-      sessionStorage.getItem("firehawk-booted") === "true";
+    let alreadyBooted = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    try { alreadyBooted ||= sessionStorage.getItem("firehawk-booted") === "true"; }
+    catch { alreadyBooted = true; }
 
     if (alreadyBooted) {
       bootScreen.remove();
@@ -110,6 +111,7 @@
         },
       });
 
+      timeline.timeScale(2);
       timeline
         .from(".boot-frame", {
           opacity: 0,
@@ -159,7 +161,7 @@
         });
 
       enterButton.addEventListener("click", () => {
-        sessionStorage.setItem("firehawk-booted", "true");
+        try { sessionStorage.setItem("firehawk-booted", "true"); } catch {}
 
         gsap
           .timeline({
