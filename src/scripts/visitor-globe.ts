@@ -64,7 +64,7 @@ export async function mountVisitorGlobe() {
     const scene = new Scene();
     const camera = new PerspectiveCamera(40, 1, .1, 20); camera.position.z = 3.4;
     const globe = new Group(); globe.rotation.y = .7; scene.add(globe);
-    const sphere = new Mesh(new SphereGeometry(1, 48, 32), new MeshBasicMaterial({ color: 0x08150e })); globe.add(sphere);
+    const sphere = new Mesh(new SphereGeometry(1, 48, 32), new MeshBasicMaterial({ color: 0x181114 })); globe.add(sphere);
     const position = (lat: number, lon: number, radius = 1.006) => {
       const phi = lat * Math.PI / 180, theta = lon * Math.PI / 180;
       return new Vector3(radius * Math.cos(phi) * Math.sin(theta), radius * Math.sin(phi), radius * Math.cos(phi) * Math.cos(theta));
@@ -74,15 +74,15 @@ export async function mountVisitorGlobe() {
       outlinePoints.push(...position(line[i-1][1], line[i-1][0]).toArray(), ...position(line[i][1], line[i][0]).toArray());
     }
     const geometry = new BufferGeometry();geometry.setAttribute("position", new Float32BufferAttribute(outlinePoints, 3));
-    globe.add(new LineSegments(geometry, new LineBasicMaterial({ color: 0x4ebd79, transparent: true, opacity: .65 })));
+    globe.add(new LineSegments(geometry, new LineBasicMaterial({ color: 0xe88b83, transparent: true, opacity: .65 })));
     const gridPoints: number[] = [];
     for (let lat = -60; lat <= 60; lat += 30) for (let lon = -180; lon < 180; lon += 3) gridPoints.push(...position(lat,lon).toArray(),...position(lat,lon+3).toArray());
     for (let lon = -180; lon < 180; lon += 30) for (let lat = -90; lat < 90; lat += 3) gridPoints.push(...position(lat,lon).toArray(),...position(lat+3,lon).toArray());
     const gridGeometry = new BufferGeometry();gridGeometry.setAttribute("position",new Float32BufferAttribute(gridPoints,3));
-    globe.add(new LineSegments(gridGeometry,new LineBasicMaterial({color:0x244832,transparent:true,opacity:.4})));
+    globe.add(new LineSegments(gridGeometry,new LineBasicMaterial({color:0x654248,transparent:true,opacity:.4})));
     const dots = new Group();globe.add(dots);
     const dotGeometry = new SphereGeometry(.018, 12, 8);
-    const dotMaterial = new MeshBasicMaterial({color:0x91ffad});
+    const dotMaterial = new MeshBasicMaterial({color:0xffd0ba});
     updateMarkers = data => {
       dots.clear();
       for (const item of data.countries) {

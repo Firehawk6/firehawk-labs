@@ -9,9 +9,9 @@ function init() {
   const ctx = canvas.getContext("2d", { alpha: false });
   if (!ctx) { el("state").textContent = "Canvas is unavailable in this browser."; return; }
   const palettes = {
-    labs: ["#070d0b", "#6dff9b", "#ffbd69"],
+    labs: ["#0b0b0d", "#ff8b83", "#ffd0a6"],
     classic: ["#222222", "#ffffff", "#e74c3c"],
-    neon: ["#000000", "#39ff14", "#00eaff"],
+    neon: ["#000000", "#ff997a", "#ffd0a6"],
     minic: ["#13dcfa", "#f90018", "#00ffea"],
     jerm: ["#000000", "#B51C1C", "#EF6594"],
   };

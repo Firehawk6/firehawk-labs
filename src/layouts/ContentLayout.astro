@@ -19,12 +19,12 @@ const { title, intro } = Astro.props;
 .content-shell { width:min(var(--content-width),calc(100% - var(--gutter) * 2));margin:auto; }
 main { padding:clamp(32px,5vw,56px) 0 var(--section-space);min-height:calc(100svh - 82px); }
 .back { display:inline-flex;align-items:center;min-height:44px;color:var(--muted);text-decoration:none;font-size:.75rem; }
-.back:hover { color:var(--green); }
-.eyebrow { color:var(--green);font-size:.75rem;letter-spacing:.1em; }
+.back:hover { color:var(--accent); }
+.eyebrow { color:var(--accent);font-size:.75rem;letter-spacing:.1em; }
 header { margin:24px 0 36px;max-width:760px; }
 h1 { font-size:clamp(2.25rem,5vw,3.5rem);line-height:1.1;letter-spacing:-.055em;margin:12px 0 18px; }
 .intro { max-width:680px;color:var(--muted);font:1.05rem/1.8 Arial,Helvetica,sans-serif;margin:0; }
 :global(.detail-copy) { color:var(--muted);font:1rem/1.8 Arial,Helvetica,sans-serif;max-width:760px; }
-:global(.detail-link) { color:var(--green);display:inline-flex;align-items:center;min-height:44px;margin-top:12px;font-size:.85rem;text-underline-offset:5px; }
+:global(.detail-link) { color:var(--accent);display:inline-flex;align-items:center;min-height:44px;margin-top:12px;font-size:.85rem;text-underline-offset:5px; }
 
 </style>

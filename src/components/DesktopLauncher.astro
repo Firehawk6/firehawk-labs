@@ -38,16 +38,16 @@ import { navigation as apps } from "../data/navigation";
 
 .desktop-launcher { padding:30px 0 0;border-top:1px solid var(--border); }
 .desktop-heading { margin-bottom:24px; }
-.desktop-heading p { margin:0;color:var(--green);font-size:.75rem;letter-spacing:.1em; }
+.desktop-heading p { margin:0;color:var(--accent);font-size:.75rem;letter-spacing:.1em; }
 .desktop-heading h2 { margin:8px 0 0;font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.2;letter-spacing:-.04em; }
 .app-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px; }
-.app-tile { display:flex;flex-direction:column;align-items:flex-start;gap:20px;min-width:0;padding:22px;border:1px solid var(--border);background:rgba(13,18,16,.82);text-decoration:none;transition:transform 160ms,border-color 160ms,background 160ms; }
-.app-tile:hover { transform:translateY(-3px);border-color:var(--green);background:var(--panel-hover); }
-.app-icon { display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);color:var(--green);font-size:1.05rem; }
+.app-tile { display:flex;flex-direction:column;align-items:flex-start;gap:20px;min-width:0;padding:22px;border:1px solid var(--border);background:rgba(22,19,22,.82);text-decoration:none;transition:transform 160ms,border-color 160ms,background 160ms; }
+.app-tile:hover { transform:translateY(-3px);border-color:var(--accent);background:var(--panel-hover); }
+.app-icon { display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);color:var(--accent);font-size:1.05rem; }
 .app-copy strong,.app-copy span { display:block; }
 .app-copy strong { font-size:1rem;letter-spacing:-.025em; }
 .app-copy span { margin-top:6px;color:var(--muted);font:.9rem/1.5 Arial,Helvetica,sans-serif; }
-.app-status { margin-top:auto;color:var(--green);font-size:.7rem;letter-spacing:.08em; }
+.app-status { margin-top:auto;color:var(--accent);font-size:.7rem;letter-spacing:.08em; }
 @media(max-width:900px) { .app-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:420px) { .app-grid { grid-template-columns:1fr; } .app-tile { display:grid;grid-template-columns:38px 1fr;gap:12px 18px;align-items:center; } .app-status { grid-column:2; } }
 
