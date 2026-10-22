@@ -5,8 +5,8 @@
   --border: #203028;
   --text: #e4eee8;
   --muted: #9aafa2;
-  --content-width: 1200px;
-  --gutter: clamp(18px, 4vw, 48px);
+  --content-width: 1800px;
+  --gutter: clamp(18px, 3vw, 64px);
   --section-space: clamp(48px, 7vw, 88px);
   --green: #6dff9b;
 }

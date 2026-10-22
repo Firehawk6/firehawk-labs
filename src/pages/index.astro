@@ -169,7 +169,7 @@ h1 span { display:block;color:var(--green); }
 .primary-action { background:var(--green);color:var(--background);border-color:var(--green)!important;font-weight:700; }
 .primary-action:hover { background:#a2ffbf; }
 .secondary-action:hover { border-color:var(--green); }
-.system-panel { min-width:0; }
+.system-panel { min-width:0;width:100%;max-width:560px;justify-self:end; }
 .workshop-note { padding:clamp(22px,3vw,32px); }
 .note-mark { color:var(--green);font-size:1.2rem; }
 .workshop-note h2 { font-size:1.5rem;line-height:1.25;letter-spacing:-.04em;margin:22px 0 12px; }
@@ -189,7 +189,7 @@ h1 span { display:block;color:var(--green); }
 footer { display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding:24px 0 32px;border-top:1px solid var(--border);font-size:.7rem;color:var(--muted); }
 .cursor-glow { position:fixed;z-index:1;top:0;left:0;width:560px;height:560px;pointer-events:none;transform:translate3d(-100vw,-100vh,0);border-radius:50%;background:radial-gradient(circle,rgba(109,255,155,.07),transparent 67%); }
 .scanlines { position:fixed;z-index:30;inset:0;pointer-events:none;opacity:.06;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.025) 4px); }
-@media(max-width:800px) { .hero { grid-template-columns:1fr; } .system-panel { max-width:600px; } }
+@media(max-width:800px) { .hero { grid-template-columns:1fr; } .system-panel { max-width:600px;justify-self:start; } }
 @media(max-width:480px) { .workspace-heading { flex-direction:column;align-items:flex-start;gap:10px; } .hero-actions a { flex:1 1 auto; } .cursor-glow { display:none; } }
 
 </style>
