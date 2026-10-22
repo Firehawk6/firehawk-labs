@@ -9,6 +9,14 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "Langton’s Ant",
+    description: "Simple rules, unpredictable patterns. An interactive ant simulation with multiple ants, custom palettes, and room to explore.",
+    category: "SIMULATIONS",
+    status: "online",
+    slug: "langtons-ant",
+    overview: "My original Langton’s ant simulation, rebuilt for Firehawk Labs with a responsive canvas and controls for exploring its patterns.",
+  },
+  {
     title: "FirehawkOS",
     description: "A custom interface for my projects, homelab, and the things I’m building.",
     category: "WEB & INTERFACES",

@@ -3,7 +3,7 @@ import ContentLayout from "../../layouts/ContentLayout.astro";
 import Panel from "../../components/ui/Panel.astro";
 import { projects } from "../../data/projects";
 export function getStaticPaths() {
-  return projects.map(project => ({ params: { slug: project.slug }, props: { project } }));
+  return projects.filter(project => project.slug !== "langtons-ant").map(project => ({ params: { slug: project.slug }, props: { project } }));
 }
 const { project } = Astro.props;
 ---
