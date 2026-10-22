@@ -1,0 +1,29 @@
+<div class="cursor-glow" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+
+<script>
+    const glow = document.querySelector(".cursor-glow");
+    if (glow instanceof HTMLElement && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      let frame = 0;
+      let x = 0;
+      let y = 0;
+      window.addEventListener("pointermove", (event) => {
+        x = event.clientX;
+        y = event.clientY;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          glow.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+          frame = 0;
+        });
+      }, { passive: true });
+    }
+
+</script>
+
+<style>
+.cursor-glow { position:fixed;z-index:1;top:0;left:0;width:560px;height:560px;pointer-events:none;transform:translate3d(-100vw,-100vh,0);border-radius:50%;background:radial-gradient(circle,rgba(109,255,155,.07),transparent 67%); }
+.scanlines { position:fixed;z-index:30;inset:0;pointer-events:none;opacity:.06;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.025) 4px); }
+@media (max-width:480px), (prefers-reduced-motion:reduce), (hover:none) {
+  .cursor-glow { display:none; }
+}
+</style>

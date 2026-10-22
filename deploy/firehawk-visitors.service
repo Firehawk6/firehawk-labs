@@ -1,0 +1,21 @@
+[Unit]
+Description=Firehawk country visit collector
+After=network.target
+
+[Service]
+User=firehawk-visitors
+Group=firehawk-visitors
+WorkingDirectory=/opt/firehawk-visitors
+EnvironmentFile=/etc/firehawk-visitors.env
+Environment=VISITOR_DB=/var/lib/firehawk-visitors/visitors.sqlite3
+ExecStart=/usr/bin/gunicorn --bind 127.0.0.1:8787 --workers 1 --threads 2 --timeout 20 app:app
+Restart=on-failure
+StateDirectory=firehawk-visitors
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

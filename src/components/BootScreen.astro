@@ -23,7 +23,7 @@
       </div>
 
       <div class="boot-line">
-        <span>&gt; Authenticating remote session</span>
+        <span>&gt; Preparing your session</span>
         <strong>OK</strong>
       </div>
 
@@ -43,7 +43,7 @@
       </div>
 
       <div class="boot-line">
-        <span>&gt; Verifying GitHub uplink</span>
+        <span>&gt; Preparing navigation</span>
         <strong>OK</strong>
       </div>
 
@@ -72,8 +72,9 @@
     enterButton instanceof HTMLButtonElement &&
     ready instanceof HTMLElement
   ) {
-    const alreadyBooted =
-      sessionStorage.getItem("firehawk-booted") === "true";
+    let alreadyBooted = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    try { alreadyBooted ||= sessionStorage.getItem("firehawk-booted") === "true"; }
+    catch { alreadyBooted = true; }
 
     if (alreadyBooted) {
       bootScreen.remove();
@@ -110,6 +111,7 @@
         },
       });
 
+      timeline.timeScale(2);
       timeline
         .from(".boot-frame", {
           opacity: 0,
@@ -159,7 +161,7 @@
         });
 
       enterButton.addEventListener("click", () => {
-        sessionStorage.setItem("firehawk-booted", "true");
+        try { sessionStorage.setItem("firehawk-booted", "true"); } catch {}
 
         gsap
           .timeline({

@@ -1,5 +1,7 @@
 ---
 import "../styles/globals.css";
+import VisitorTracker from "../components/VisitorTracker.astro";
+import Atmosphere from "../components/Atmosphere.astro";
 import BackgroundScene from "../components/BackgroundScene.astro";
 import BootScreen from "../components/BootScreen.astro";
 
@@ -10,7 +12,7 @@ interface Props {
 
 const {
   title,
-  description = "Projects, experiments, infrastructure, and strange ideas from Firehawk Labs.",
+  description = "Building what I want. Personal projects, a homelab, and whatever comes next.",
 } = Astro.props;
 ---
 
@@ -29,6 +31,8 @@ const {
 
   <body>
     <BackgroundScene />
+    <Atmosphere />
+    <VisitorTracker />
     <BootScreen />
 
     <div class="page-content">

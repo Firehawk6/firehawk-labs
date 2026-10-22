@@ -22,6 +22,7 @@
             BufferAttribute,
             BufferGeometry,
             Clock,
+            CanvasTexture,
             GridHelper,
             PerspectiveCamera,
             Points,
@@ -52,7 +53,7 @@
           });
 
           renderer.setPixelRatio(
-            Math.min(window.devicePixelRatio, 1.5)
+            Math.min(window.devicePixelRatio, 2)
           );
 
           renderer.setSize(
@@ -104,9 +105,24 @@
             new BufferAttribute(positions, 3)
           );
 
+          // A soft circular sprite avoids the default square point appearance.
+          const sprite = document.createElement("canvas");
+          sprite.width = sprite.height = 64;
+          const context = sprite.getContext("2d");
+          if (!context) throw new Error("Particle texture context unavailable");
+          const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+          gradient.addColorStop(0, "rgba(255,255,255,1)");
+          gradient.addColorStop(0.25, "rgba(255,255,255,0.8)");
+          gradient.addColorStop(1, "rgba(255,255,255,0)");
+          context.fillStyle = gradient;
+          context.fillRect(0, 0, 64, 64);
+          const particleTexture = new CanvasTexture(sprite);
+
           const particleMaterial = new PointsMaterial({
             color: 0x6dff9b,
-            size: 0.035,
+            size: 0.045,
+            map: particleTexture,
+            depthWrite: false,
             transparent: true,
             opacity: 0.4,
             sizeAttenuation: true,
@@ -146,7 +162,7 @@
             camera.updateProjectionMatrix();
 
             renderer.setPixelRatio(
-              Math.min(window.devicePixelRatio, 1.5)
+              Math.min(window.devicePixelRatio, 2)
             );
 
             renderer.setSize(
@@ -175,13 +191,15 @@
           const renderFrame = () => {
             if (!running) return;
 
-            const elapsed = clock.getElapsedTime();
+            const delta = clock.getDelta();
+            const elapsed = clock.elapsedTime;
+            const follow = 1 - Math.exp(-22 * delta);
 
             currentMouse.x +=
-              (targetMouse.x - currentMouse.x) * 0.025;
+              (targetMouse.x - currentMouse.x) * follow;
 
             currentMouse.y +=
-              (targetMouse.y - currentMouse.y) * 0.025;
+              (targetMouse.y - currentMouse.y) * follow;
 
             camera.position.x = currentMouse.x;
             camera.position.y = 5.5 - currentMouse.y;
@@ -240,6 +258,8 @@
             );
 
             particleGeometry.dispose();
+            particleTexture.dispose();
+            grid.geometry.dispose();
             particleMaterial.dispose();
 
             for (const material of gridMaterials) {

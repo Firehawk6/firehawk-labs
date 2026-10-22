@@ -1,0 +1,27 @@
+<script>
+  // A random tab-session ID deduplicates navigation/reloads, without storing IPs.
+  const recordVisit = async () => {
+    if (navigator.doNotTrack === "1" || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl) return;
+    try {
+      const day = new Date().toISOString().slice(0, 10);
+      if (sessionStorage.getItem("firehawk-counted-day") === day) return;
+      let session = sessionStorage.getItem("firehawk-visit-session");
+      if (!session) {
+        session = crypto.randomUUID();
+        sessionStorage.setItem("firehawk-visit-session", session);
+      }
+      const response = await fetch("/api/visitors/visit", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session }), credentials: "omit", keepalive: true,
+      });
+      if (response.ok) {
+        sessionStorage.setItem("firehawk-counted-day", day);
+        window.dispatchEvent(new Event("firehawk:visit-recorded"));
+      }
+    } catch { /* Missing collector or blocked storage should never block the site. */ }
+  };
+  if (document.visibilityState === "visible") void recordVisit();
+  else document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void recordVisit();
+  }, { once: true });
+</script>

@@ -1,43 +1,31 @@
-# Astro Starter Kit: Minimal
+# Firehawk Labs
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Public Astro site with a project showcase, homelab overview, server-status page, and navigation terminal.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Development
 
-## 🚀 Project Structure
+Requires Node.js >=22.12. Run `npm ci`, then `npm run dev -- --background`.
+Run `npm run build` for production output in `dist/`.
 
-Inside of your Astro project, you'll see the following folders and files:
+## Content
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+- `src/data/navigation.ts`: shared menu, launcher, and terminal destinations.
+- `src/data/projects.ts`: public projects. Adding a record generates its detail page.
+- `/homelab`: public infrastructure overview.
+- `/status`: Minecraft monitoring placeholder; no uptime source is configured.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Server status needs a public monitoring feed before actual availability or percentages can be displayed. No private management endpoints or credentials belong in browser code.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Visual effects
 
-Any static assets, like images, can be placed in the `public/` directory.
+The homepage glow follows the pointer once per animation frame without a trailing animation. Background parallax uses frame-rate-independent smoothing. Particles use a soft radial canvas texture.
 
-## 🧞 Commands
+## Deployment
 
-All commands are run from the root of the project, from a terminal:
+Build first, then copy `dist/` into the Nginx document root. Astro generates static redirect pages for legacy URLs. No Node server is needed in production.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Removing source links from the site does not change repository visibility or conceal browser-delivered code.
 
-## 👀 Want to learn more?
+## Visitor globe
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The homepage globe displays real country totals from an optional local collector. Follow [visitor setup](deploy/VISITORS.md) to enable Cloudflare geolocation and install the service on the Ubuntu VM. Until connected, the globe shows no simulated visits.

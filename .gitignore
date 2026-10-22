@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# collector runtime data
+__pycache__/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm

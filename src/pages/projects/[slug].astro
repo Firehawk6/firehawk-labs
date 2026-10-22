@@ -1,0 +1,13 @@
+---
+import ContentLayout from "../../layouts/ContentLayout.astro";
+import Panel from "../../components/ui/Panel.astro";
+import { projects } from "../../data/projects";
+export function getStaticPaths() {
+  return projects.map(project => ({ params: { slug: project.slug }, props: { project } }));
+}
+const { project } = Astro.props;
+---
+<ContentLayout title={project.title} intro={project.description}>
+  <Panel title="ABOUT THIS PROJECT"><p class="detail-copy">{project.overview}</p></Panel>
+  <a class="detail-link" href="/projects">← All projects</a>
+</ContentLayout>
