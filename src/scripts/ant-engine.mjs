@@ -1,7 +1,7 @@
 // Pure simulation; no DOM, rendering, or timers.
 export const TILE = 32;
 export class AntWorld {
-  constructor({ count = 1, maxAnts = 1500, spawn = false, random = Math.random, maxTiles = 4096 } = {}) {
+  constructor({ count = 1, maxAnts = 1500, spawn = false, random = Math.random, maxTiles = 65536 } = {}) {
     this.tiles = new Map();
     this.ants = [];
     this.ticks = 0;
@@ -10,7 +10,7 @@ export class AntWorld {
     this.random = random;
     this.spawn = spawn;
     this.maxAnts = Math.max(1, Math.min(1500, Math.floor(maxAnts) || 1500));
-    this.maxTiles = Math.max(1, Math.min(4096, Math.floor(maxTiles) || 4096));
+    this.maxTiles = Math.max(1, Math.min(65536, Math.floor(maxTiles) || 65536));
     this.radius = 100;
     count = Math.max(1, Math.min(100, this.maxAnts, Math.floor(count) || 1));
     // Unique positions without random-placement retry loops.

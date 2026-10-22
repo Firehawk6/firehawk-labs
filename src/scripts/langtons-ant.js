@@ -16,7 +16,7 @@ function init() {
     jerm: ["#000000", "#B51C1C", "#EF6594"],
   };
   const speeds = [1, 60, 600, 6000, 30000];
-  let world = new AntWorld(), cache = new WeakMap();
+  let world = new AntWorld(), cache = new Map();
   let running = false, visible = true, dirty = true, frame = 0;
   let width = 0, height = 0, dpr = 1, scale = 10, ox = 0, oy = 0;
   let last = 0, debt = 0, sampleTime = 0, sampleTicks = 0, lastStats = 0;
@@ -28,7 +28,7 @@ function init() {
     el("step").disabled = running || world.limit;
     el("play").disabled = world.limit;
     el("state").textContent = world.limit ? "Memory limit reached — reset to continue" :
-      running ? ((!visible || document.hidden) ? "Suspended while out of view" : "Running") : "Paused — ready to explore";
+      running ? ((!visible || document.hidden) ? "Suspended while out of view" : (world.spawn && world.ants.length >= world.maxAnts ? "Running — ant cap reached; spawning off" : "Running")) : "Paused — ready to explore";
   }
   function stats(now, force = false) {
     if (!force && now - lastStats < 250) return;
@@ -41,6 +41,7 @@ function init() {
       sampleTicks = world.ticks; sampleTime = now;
     }
     lastStats = now;
+    status();
   }
   function schedule() {
     if (!frame && visible && !document.hidden) frame = requestAnimationFrame(loop);
@@ -70,6 +71,8 @@ function init() {
         const image = document.createElement("canvas");
         image.width = image.height = TILE;
         entry = { image, context: image.getContext("2d"), version: -1 };
+        // Keep at most 256 raster tiles, independent of simulation size.
+        if (cache.size >= 256) cache.delete(cache.keys().next().value);
         cache.set(tile, entry);
       }
       if (entry.version !== tile.version) {
@@ -118,7 +121,7 @@ function init() {
   }
   function reset() {
     running = false; debt = 0; last = 0;
-    world = new AntWorld(applied); cache = new WeakMap();
+    world = new AntWorld(applied); cache = new Map();
     sampleTime = performance.now(); sampleTicks = 0;
     scale = applied.count === 1 ? 10 : 6;
     center(); status(); stats(performance.now(), true);
@@ -134,7 +137,7 @@ function init() {
     applied = { count, maxAnts, spawn: el("spawn").checked }; reset();
   };
   el("speed").oninput = () => { el("speed-value").textContent = speeds[Number(el("speed").value)].toLocaleString() + " ticks/s"; debt = 0; };
-  el("theme").onchange = () => { cache = new WeakMap(); change(); };
+  el("theme").onchange = () => { cache = new Map(); change(); };
   el("follow").onchange = () => { if (el("follow").checked) center(); };
   el("center").onclick = center;
   function zoom(factor, x = width / 2, y = height / 2) {

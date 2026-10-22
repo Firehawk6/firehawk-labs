@@ -56,3 +56,11 @@ for (let i = 0; i < 100; i++) {
 check(capped.ticks === 101 && JSON.stringify(capped.ants) !== before, "Ants did not keep moving");
 check(new AntWorld({ maxAnts: 9999 }).maxAnts === 1500, "Population ceiling missing");
 console.log("PASS: grows to 1,500 ants, keeps moving at cap, enforces ceiling");
+
+// Reproduce the real growth path that previously exhausted 4,096 chunks at tick 6,489.
+let seed = 42;
+const random = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+const growing = new AntWorld({ count: 100, spawn: true, random });
+for (let i = 0; i < 12000; i++) check(growing.step(), "Natural growth stopped at tick " + i);
+check(growing.ants.length === 1500 && growing.tiles.size > 4096 && !growing.limit, "Growth regression did not exercise old memory limit");
+console.log("PASS: natural growth through 12,000 ticks", { ants: growing.ants.length, tiles: growing.tiles.size });
