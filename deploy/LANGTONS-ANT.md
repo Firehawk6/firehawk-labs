@@ -11,7 +11,7 @@ No new Python service, port, database, or Nginx route is needed.
 The engine uses sparse 32×32 Uint8Array chunks, removes empty chunks, and pauses before exceeding 65,536 chunks (64 MiB of cell arrays at capacity).
 Collision spawning retains the original at-most-one-new-ant-per-tick behavior, with an explicit cap (default and maximum 1,500). Reaching the population cap disables spawning only; existing ants continue moving. The separate memory limit still pauses the simulation.
 One-ant starts are centered and deterministic; multi-ant starts use unique positions.
-Rendering visits only visible chunks, caching each chunk raster until changed, with a separate 256-entry rendering cache. A 5 ms simulation budget per animation frame prevents catch-up loops from monopolizing the main thread; speed is a target, not a guarantee.
+Rendering visits only visible chunks, caching each chunk raster until changed, with a reusable 8,192-slot RGBA atlas (32 MiB) and one reusable upload buffer. No per-chunk canvases are allocated. A 5 ms simulation budget per animation frame prevents catch-up loops from monopolizing the main thread; speed is a target, not a guarantee.
 Hidden/offscreen simulations suspend. Requested run state resumes when visible.
 There is no persistent save state; image export saves the current viewport.
 

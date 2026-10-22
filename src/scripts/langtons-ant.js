@@ -1,4 +1,5 @@
 import { AntWorld, TILE } from "./ant-engine.mjs";
+import { AntRasterCache } from "./ant-raster-cache.mjs";
 
 const root = document.getElementById("ant-lab");
 if (root) init();
@@ -16,7 +17,8 @@ function init() {
     jerm: ["#000000", "#B51C1C", "#EF6594"],
   };
   const speeds = [1, 60, 600, 6000, 30000];
-  let world = new AntWorld(), cache = new Map();
+  let world = new AntWorld();
+  const cache = new AntRasterCache(() => document.createElement("canvas"));
   let running = false, visible = true, dirty = true, frame = 0;
   let width = 0, height = 0, dpr = 1, scale = 10, ox = 0, oy = 0;
   let last = 0, debt = 0, sampleTime = 0, sampleTicks = 0, lastStats = 0;
@@ -78,22 +80,8 @@ function init() {
       }
     }
     for (const { tx, ty, tile } of visibleTiles()) {
-      let entry = cache.get(tile);
-      if (!entry) {
-        const image = document.createElement("canvas");
-        image.width = image.height = TILE;
-        entry = { image, context: image.getContext("2d"), version: -1 };
-        // Keep at most 256 raster tiles, independent of simulation size.
-        if (cache.size >= 256) cache.delete(cache.keys().next().value);
-        cache.set(tile, entry);
-      }
-      if (entry.version !== tile.version) {
-        const c = entry.context;
-        c.clearRect(0, 0, TILE, TILE); c.fillStyle = colors[1];
-        for (let i = 0; i < tile.cells.length; i++) if (tile.cells[i]) c.fillRect(i % TILE, Math.floor(i / TILE), 1, 1);
-        entry.version = tile.version;
-      }
-      ctx.drawImage(entry.image, ox + tx * size, oy + ty * size, size, size);
+      const entry = cache.get(tile, colors[1]);
+      ctx.drawImage(cache.image, entry.x, entry.y, TILE, TILE, ox + tx * size, oy + ty * size, size, size);
     }
     ctx.fillStyle = colors[2];
     for (const ant of world.ants) {
@@ -133,7 +121,7 @@ function init() {
   }
   function reset() {
     running = false; debt = 0; last = 0;
-    world = new AntWorld(applied); cache = new Map();
+    world = new AntWorld(applied); cache.clear();
     sampleTime = performance.now(); sampleTicks = 0;
     scale = applied.count === 1 ? 10 : 6;
     center(); status(); stats(performance.now(), true);
@@ -149,7 +137,7 @@ function init() {
     applied = { count, maxAnts, spawn: el("spawn").checked }; reset();
   };
   el("speed").oninput = () => { el("speed-value").textContent = speeds[Number(el("speed").value)].toLocaleString() + " ticks/s"; debt = 0; };
-  el("theme").onchange = () => { cache = new Map(); change(); };
+  el("theme").onchange = () => { cache.clear(); change(); };
   el("follow").onchange = () => { if (el("follow").checked) center(); };
   el("center").onclick = center;
   function zoom(factor, x = width / 2, y = height / 2) {
