@@ -118,27 +118,9 @@ const getWindowStatus = (
     </footer>
   </div>
 
-  <div class="cursor-glow"></div>
-  <div class="scanlines"></div>
 
   <script>
     import gsap from "gsap";
-
-    const glow = document.querySelector(".cursor-glow");
-    if (glow instanceof HTMLElement && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      let frame = 0;
-      let x = 0;
-      let y = 0;
-      window.addEventListener("pointermove", (event) => {
-        x = event.clientX;
-        y = event.clientY;
-        if (frame) return;
-        frame = requestAnimationFrame(() => {
-          glow.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-          frame = 0;
-        });
-      }, { passive: true });
-    }
 
     let animated = false;
     const animateInterface = () => {
@@ -187,9 +169,7 @@ h1 span { display:block;color:var(--green); }
 .description { max-width:640px;margin:0 0 24px;color:var(--muted);font:1rem/1.7 Arial,Helvetica,sans-serif; }
 .project-meta { display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:auto;padding-top:18px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted); }
 footer { display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding:24px 0 32px;border-top:1px solid var(--border);font-size:.7rem;color:var(--muted); }
-.cursor-glow { position:fixed;z-index:1;top:0;left:0;width:560px;height:560px;pointer-events:none;transform:translate3d(-100vw,-100vh,0);border-radius:50%;background:radial-gradient(circle,rgba(109,255,155,.07),transparent 67%); }
-.scanlines { position:fixed;z-index:30;inset:0;pointer-events:none;opacity:.06;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.025) 4px); }
 @media(max-width:800px) { .hero { grid-template-columns:1fr; } .system-panel { max-width:600px;justify-self:start; } }
-@media(max-width:480px) { .workspace-heading { flex-direction:column;align-items:flex-start;gap:10px; } .hero-actions a { flex:1 1 auto; } .cursor-glow { display:none; } }
+@media(max-width:480px) { .workspace-heading { flex-direction:column;align-items:flex-start;gap:10px; } .hero-actions a { flex:1 1 auto; } }
 
 </style>
