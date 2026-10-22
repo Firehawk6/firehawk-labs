@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import TwitchLink from "../components/TwitchLink.astro";
 import DesktopLauncher from "../components/DesktopLauncher.astro";
 import TopBar from "../components/home/TopBar.astro";
 import VisitorGlobe from "../components/VisitorGlobe.astro";
@@ -43,6 +44,7 @@ const getWindowStatus = (
               LAUNCH TERMINAL
             </a>
           </div>
+          <TwitchLink />
         </div>
 
         <aside class="system-panel">

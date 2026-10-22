@@ -4,6 +4,11 @@ import json
 import os
 import re
 import sqlite3
+import time
+import threading
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode
+from urllib.error import HTTPError
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from flask import Flask, jsonify, request
@@ -123,3 +128,77 @@ def sort_complete():
         return jsonify(recorded=added, total=total)
     finally:
         db.close()
+
+
+# All Twitch credentials and OAuth tokens stay in this process.
+TWITCH_CHANNEL = 'tezzzzaa'
+_twitch_lock = threading.Lock()
+_twitch_cache = {'until': 0, 'data': {'status': 'unknown'}}
+_twitch_token = {'value': '', 'until': 0}
+
+
+def twitch_json(url, data=None, headers=None):
+    req = Request(url, data=data, headers=headers or {})
+    with urlopen(req, timeout=3) as response:
+        return json.loads(response.read(65536))
+
+
+def twitch_access_token(client_id, secret):
+    if _twitch_token['value'] and time.monotonic() < _twitch_token['until']:
+        return _twitch_token['value']
+    payload = urlencode({'client_id': client_id, 'client_secret': secret, 'grant_type': 'client_credentials'}).encode()
+    data = twitch_json('https://id.twitch.tv/oauth2/token', data=payload,
+                       headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    token = data.get('access_token')
+    if not isinstance(token, str) or not token:
+        raise ValueError('Invalid Twitch token response')
+    _twitch_token.update(value=token, until=time.monotonic() + max(0, int(data['expires_in']) - 60))
+    return token
+
+
+@app.get('/api/twitch')
+def twitch_status():
+    client_id = os.environ.get('TWITCH_CLIENT_ID', '')
+    secret = os.environ.get('TWITCH_CLIENT_SECRET', '')
+    if not client_id or not secret:
+        return jsonify(status='unknown')
+    if time.monotonic() < _twitch_cache['until']:
+        return jsonify(_twitch_cache['data'])
+    # Don't let multiple visitors trigger a burst of upstream requests.
+    if not _twitch_lock.acquire(blocking=False):
+        return jsonify(status='unknown')
+    try:
+        if time.monotonic() < _twitch_cache['until']:
+            return jsonify(_twitch_cache['data'])
+        try:
+            for attempt in range(2):
+                token = twitch_access_token(client_id, secret)
+                try:
+                    result = twitch_json('https://api.twitch.tv/helix/streams?user_login=' + TWITCH_CHANNEL,
+                                         headers={'Client-ID': client_id, 'Authorization': 'Bearer ' + token})
+                    break
+                except HTTPError as error:
+                    if error.code != 401 or attempt:
+                        raise
+                    _twitch_token.update(value='', until=0)
+            streams = result.get('data')
+            if not isinstance(streams, list):
+                raise ValueError('Invalid Twitch streams response')
+            if streams:
+                stream = streams[0]
+                if stream.get('user_login', '').lower() != TWITCH_CHANNEL or stream.get('type') != 'live':
+                    raise ValueError('Unexpected Twitch stream')
+                data = {'status': 'live', 'title': str(stream.get('title', ''))[:300],
+                        'category': str(stream.get('game_name', ''))[:200],
+                        'viewers': max(0, int(stream.get('viewer_count', 0)))}
+            else:
+                data = {'status': 'offline'}
+            ttl = 60
+        except Exception:
+            # Never expose credentials, upstream errors, or stale live claims.
+            data = {'status': 'unknown'}
+            ttl = 30
+        _twitch_cache.update(until=time.monotonic() + ttl, data=data)
+        return jsonify(data)
+    finally:
+        _twitch_lock.release()
