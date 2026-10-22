@@ -62,10 +62,22 @@ function init() {
     const size = TILE * scale;
     const minX = Math.floor(-ox / size), maxX = Math.floor((width - ox) / size);
     const minY = Math.floor(-oy / size), maxY = Math.floor((height - oy) / size);
-    // Look up only visible chunks. Cache rasterized chunks until their contents change.
-    for (let ty = minY; ty <= maxY; ty++) for (let tx = minX; tx <= maxX; tx++) {
-      const tile = world.tiles.get(tx + "," + ty);
-      if (!tile) continue;
+    // At wide zoom, scan occupied chunks instead of thousands of empty positions.
+    function* visibleTiles() {
+      const area = (maxX - minX + 1) * (maxY - minY + 1);
+      if (area > world.tiles.size) {
+        for (const [key, tile] of world.tiles) {
+          const [tx, ty] = key.split(",").map(Number);
+          if (tx >= minX && tx <= maxX && ty >= minY && ty <= maxY) yield { tx, ty, tile };
+        }
+      } else {
+        for (let ty = minY; ty <= maxY; ty++) for (let tx = minX; tx <= maxX; tx++) {
+          const tile = world.tiles.get(tx + "," + ty);
+          if (tile) yield { tx, ty, tile };
+        }
+      }
+    }
+    for (const { tx, ty, tile } of visibleTiles()) {
       let entry = cache.get(tile);
       if (!entry) {
         const image = document.createElement("canvas");
@@ -141,7 +153,7 @@ function init() {
   el("follow").onchange = () => { if (el("follow").checked) center(); };
   el("center").onclick = center;
   function zoom(factor, x = width / 2, y = height / 2) {
-    const next = Math.max(2, Math.min(40, scale * factor));
+    const next = Math.max(0.25, Math.min(40, scale * factor));
     ox = x - (x - ox) * next / scale; oy = y - (y - oy) * next / scale;
     scale = next; change();
   }
