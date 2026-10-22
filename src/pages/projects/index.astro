@@ -1,0 +1,14 @@
+---
+import ContentLayout from "../../layouts/ContentLayout.astro";
+import Panel from "../../components/ui/Panel.astro";
+import { projects } from "../../data/projects";
+---
+<ContentLayout title="Projects" intro="Things I’m building, learning, and making my own.">
+  <div class="projects">
+    {projects.map(project => <Panel title={project.category} meta="IN PROGRESS">
+      <h2>{project.title}</h2><p class="detail-copy">{project.description}</p>
+      <a class="detail-link" href={`/projects/${project.slug}`}>Explore project →</a>
+    </Panel>)}
+  </div>
+</ContentLayout>
+<style>.projects { display:grid;gap:24px; } h2 { font-size:2rem;margin:0; }</style>

@@ -1,0 +1,26 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import TopBar from "../components/home/TopBar.astro";
+interface Props { title: string; intro: string; }
+const { title, intro } = Astro.props;
+---
+<BaseLayout title={`${title} | Firehawk Labs`} description={intro}>
+  <div class="content-shell">
+    <TopBar />
+    <main>
+      <a class="back" href="/">← HOME</a>
+      <header><p class="eyebrow">FIREHAWK LABS</p><h1>{title}</h1><p class="intro">{intro}</p></header>
+      <slot />
+    </main>
+  </div>
+</BaseLayout>
+<style>
+.content-shell { width:min(1100px,calc(100% - 32px));margin:auto; }
+main { padding:50px 0 100px; }
+.back,.eyebrow { color:var(--green);font-size:.75rem;letter-spacing:.1em; }
+header { margin:45px 0; }
+h1 { font-size:clamp(2.6rem,7vw,5.5rem);letter-spacing:-.05em;margin:12px 0; }
+.intro { max-width:720px;color:var(--muted);line-height:1.8; }
+:global(.detail-copy) { color:var(--muted);line-height:1.8;max-width:760px; }
+:global(.detail-link) { color:var(--green);display:inline-block;margin-top:16px; }
+</style>

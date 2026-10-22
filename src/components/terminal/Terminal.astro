@@ -24,6 +24,7 @@
 </div>
 
 <script>
+  import { navigation } from "../../data/navigation";
   const form = document.querySelector("#terminal-form");
   const input = document.querySelector("#terminal-input");
   const output = document.querySelector("#terminal-output");
@@ -33,25 +34,15 @@
       [
         "Available commands:",
         "help        Show this command list",
-        "projects    Open the project archive",
-        "homelab     Open the homelab project",
-        "experiments Open experiments",
-        "github      Open GitHub",
+        ...navigation.map(item => `${item.command.padEnd(12)}Open ${item.name}`),
         "about       About Firehawk Labs",
-        "status      Show system status",
         "clear       Clear the terminal",
       ].join("\n"),
 
     about: () =>
-      "Firehawk Labs is a digital workshop for infrastructure, automation, web experiments, games, and strange ideas.",
+      "Firehawk Labs is a digital workshop for personal projects, infrastructure, automation, and things I’m building.",
 
-    status: () =>
-      [
-        "HOST: FIREHAWK-LABS",
-        "STATUS: ONLINE",
-        "MODE: EXPERIMENTAL",
-        "UPLINK: SECURE",
-      ].join("\n"),
+
   };
 
   const appendLine = (text: string, className = "") => {
@@ -88,23 +79,11 @@
 
       if (normalized === "clear") {
         output.innerHTML = "";
-      } else if (normalized === "projects") {
-        appendLine("Opening project archive...");
-        window.location.href = "/#projects";
-      } else if (normalized === "homelab") {
-        appendLine("Opening homelab...");
-        window.location.href = "/projects/homelab";
-      } else if (normalized === "experiments") {
-        appendLine("Opening experiments...");
-        window.location.href = "/experiments";
-      } else if (normalized === "github") {
-        appendLine("Opening GitHub uplink...");
-        window.open(
-          "https://github.com/Firehawk6",
-          "_blank",
-          "noopener,noreferrer"
-        );
-      } else if (commands[normalized]) {
+      } else if (navigation.some(item => item.command === normalized)) {
+        const destination = navigation.find(item => item.command === normalized)!;
+        appendLine(`Opening ${destination.name}...`);
+        window.location.href = destination.href;
+      } else if (Object.hasOwn(commands, normalized)) {
         appendLine(commands[normalized]());
       } else {
         appendLine(

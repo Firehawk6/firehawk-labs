@@ -1,4 +1,5 @@
 ---
+import { navigation } from "../../data/navigation";
 import StatusLight from "../ui/StatusLight.astro";
 ---
 
@@ -12,22 +13,12 @@ import StatusLight from "../ui/StatusLight.astro";
     </span>
   </a>
 
-  <nav>
-    <a href="#projects">PROJECTS</a>
-    <a href="/experiments">EXPERIMENTS</a>
-    <a href="/terminal">TERMINAL</a>
-
-    <a
-      href="https://github.com/Firehawk6"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      GITHUB ↗
-    </a>
+  <nav aria-label="Main navigation">
+    {navigation.map(item => <a href={item.href} aria-current={Astro.url.pathname.replace(/\/$/, "") === item.href ? "page" : undefined}>{item.name.toUpperCase()}</a>)}
   </nav>
 
   <div class="status-wrapper">
-    <StatusLight />
+    <StatusLight label="INTERFACE READY" />
   </div>
 </header>
 
@@ -103,7 +94,8 @@ import StatusLight from "../ui/StatusLight.astro";
     transition:color .2s;
   }
 
-  nav a:hover{
+  nav a:hover,
+  nav a[aria-current="page"]{
     color:var(--green);
   }
 
@@ -118,7 +110,11 @@ import StatusLight from "../ui/StatusLight.astro";
     }
 
     nav{
-      display:none;
+      display:flex;
+      grid-column:1 / -1;
+      flex-wrap:wrap;
+      gap:16px;
+      padding:16px 0;
     }
 
   }

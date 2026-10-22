@@ -4,41 +4,16 @@ export interface Project {
   category: string;
   status: "online" | "development" | "archived";
   slug: string;
-  github?: string;
+  overview: string;
 }
 
 export const projects: Project[] = [
   {
-    title: "Homelab",
-    description:
-      "Servers, networking, virtualization, storage, and the mildly irresponsible amount of hardware behind it all.",
-    category: "INFRASTRUCTURE",
+    title: "FirehawkOS",
+    description: "A custom interface for my projects, homelab, and the things I’m building.",
+    category: "WEB & INTERFACES",
     status: "development",
-    slug: "homelab",
-  },
-  {
-    title: "Minecraft Network",
-    description:
-      "Custom servers, routing, proxies, mods, and the chaos required to keep everything online.",
-    category: "GAME SYSTEMS",
-    status: "development",
-    slug: "minecraft-network",
-  },
-  {
-    title: "Security Lab",
-    description:
-      "Isolated environments for testing tools, policies, endpoints, and security ideas.",
-    category: "CYBERSECURITY",
-    status: "development",
-    slug: "security-lab",
-  },
-  {
-    title: "Web Experiments",
-    description:
-      "Animations, interfaces, mouse effects, strange interactions, and ideas that probably did not need to exist.",
-    category: "CREATIVE CODE",
-    status: "online",
-    slug: "web-experiments",
-    github: "https://github.com/Firehawk6",
+    slug: "firehawkos",
+    overview: "FirehawkOS is the interface you’re exploring now: a personal website with a terminal, an interactive background, and space to share ongoing projects. It’s a work in progress that will grow alongside the things I build.",
   },
 ];

@@ -38,8 +38,8 @@ const getWindowStatus = (
           </p>
 
           <div class="hero-actions">
-            <a class="primary-action" href="#projects">
-              OPEN PROJECT ARCHIVE
+            <a class="primary-action" href="/projects">
+              VIEW PROJECTS
             </a>
 
             <a class="secondary-action" href="/terminal">
@@ -51,7 +51,7 @@ const getWindowStatus = (
         <aside class="system-panel">
           <Panel
             title="SYSTEM OVERVIEW"
-            meta="LIVE"
+            meta="OVERVIEW"
             padded={false}
           >
             <dl class="system-overview">
@@ -61,8 +61,8 @@ const getWindowStatus = (
               </div>
 
               <div>
-                <dt>STATUS</dt>
-                <dd class="online">ONLINE</dd>
+                <dt>INTERFACE</dt>
+                <dd class="online">READY</dd>
               </div>
 
               <div>
@@ -76,8 +76,8 @@ const getWindowStatus = (
               </div>
 
               <div>
-                <dt>UPLINK</dt>
-                <dd>SECURE</dd>
+                <dt>FOCUS</dt>
+                <dd>BUILDING</dd>
               </div>
             </dl>
 
@@ -86,7 +86,7 @@ const getWindowStatus = (
 
               <p>&gt; Interface initialized</p>
               <p>&gt; Project archive mounted</p>
-              <p>&gt; GitHub uplink available</p>
+              <p>&gt; Navigation ready</p>
 
               <p class="cursor-line">
                 &gt; Awaiting input<span>_</span>
@@ -102,11 +102,11 @@ const getWindowStatus = (
         <div class="workspace-heading">
           <div>
             <p class="eyebrow">DIRECTORY / PROJECTS</p>
-            <h2>PROJECT ARCHIVE</h2>
+            <h2>PROJECTS</h2>
           </div>
 
           <span>
-            {String(projects.length).padStart(2, "0")} NODES AVAILABLE
+            {String(projects.length).padStart(2, "0")} {projects.length === 1 ? "PROJECT" : "PROJECTS"}
           </span>
         </div>
 
@@ -164,23 +164,23 @@ const getWindowStatus = (
     import gsap from "gsap";
 
     const glow = document.querySelector(".cursor-glow");
-
-    window.addEventListener("mousemove", (event) => {
-      if (!(glow instanceof HTMLElement)) return;
-
-      glow.animate(
-        {
-          left: `${event.clientX}px`,
-          top: `${event.clientY}px`,
-        },
-        {
-          duration: 500,
-          fill: "forwards",
-        }
-      );
-    });
+    if (glow instanceof HTMLElement && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      let frame = 0;
+      let x = 0;
+      let y = 0;
+      window.addEventListener("pointermove", (event) => {
+        x = event.clientX;
+        y = event.clientY;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          glow.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+          frame = 0;
+        });
+      }, { passive: true });
+    }
 
     const animateInterface = () => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       gsap.set(".topbar", {
         opacity: 0,
         y: -24,
@@ -487,7 +487,7 @@ const getWindowStatus = (
 
   .project-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
     gap: 18px;
   }
 
@@ -558,7 +558,9 @@ const getWindowStatus = (
     width: 560px;
     height: 560px;
     pointer-events: none;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    transform: translate3d(-100vw, -100vh, 0);
     border-radius: 50%;
     background: radial-gradient(
       circle,
