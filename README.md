@@ -25,3 +25,7 @@ The homepage glow follows the pointer once per animation frame without a trailin
 Build first, then copy `dist/` into the Nginx document root. Astro generates static redirect pages for legacy URLs. No Node server is needed in production.
 
 Removing source links from the site does not change repository visibility or conceal browser-delivered code.
+
+## Visitor globe
+
+The homepage globe displays real country totals from an optional local collector. Follow [visitor setup](deploy/VISITORS.md) to enable Cloudflare geolocation and install the service on the Ubuntu VM. Until connected, the globe shows no simulated visits.
