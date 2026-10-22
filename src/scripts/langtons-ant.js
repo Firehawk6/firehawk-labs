@@ -20,7 +20,7 @@ function init() {
   let running = false, visible = true, dirty = true, frame = 0;
   let width = 0, height = 0, dpr = 1, scale = 10, ox = 0, oy = 0;
   let last = 0, debt = 0, sampleTime = 0, sampleTicks = 0, lastStats = 0;
-  let applied = { count: 1, maxAnts: 100, spawn: false };
+  let applied = { count: 1, maxAnts: 1500, spawn: false };
   let drag = null;
 
   function status() {
@@ -129,7 +129,7 @@ function init() {
   el("apply").onclick = () => {
     if (!el("count").reportValidity() || !el("cap").reportValidity()) return;
     const count = Math.max(1, Math.min(100, Number(el("count").value) || 1));
-    const maxAnts = Math.max(count, Math.min(500, Number(el("cap").value) || 100));
+    const maxAnts = Math.max(count, Math.min(1500, Number(el("cap").value) || 1500));
     el("count").value = String(count); el("cap").value = String(maxAnts);
     applied = { count, maxAnts, spawn: el("spawn").checked }; reset();
   };

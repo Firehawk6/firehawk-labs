@@ -9,7 +9,7 @@ The VM serves static assets; each visitor runs a private simulation in their bro
 No new Python service, port, database, or Nginx route is needed.
 
 The engine uses sparse 32×32 Uint8Array chunks, removes empty chunks, and pauses before exceeding 4096 chunks.
-Collision spawning retains the original at-most-one-new-ant-per-tick behavior, with an explicit cap (maximum 500).
+Collision spawning retains the original at-most-one-new-ant-per-tick behavior, with an explicit cap (default and maximum 1,500). Reaching the population cap disables spawning only; existing ants continue moving. The separate memory limit still pauses the simulation.
 One-ant starts are centered and deterministic; multi-ant starts use unique positions.
 Rendering visits only visible chunks, caching each chunk raster until changed. A 5 ms simulation budget per animation frame prevents catch-up loops from monopolizing the main thread; speed is a target, not a guarantee.
 Hidden/offscreen simulations suspend. Requested run state resumes when visible.

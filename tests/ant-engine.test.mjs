@@ -42,3 +42,17 @@ check(many.ants.length === 100 && new Set(many.ants.map(a => a.x + "," + a.y)).s
 for (let i = 0; i < 2000; i++) check(many.step(), "Multi-ant run stopped early");
 check(many.active >= 0 && many.active <= many.tiles.size * 1024, "Invalid active count");
 console.log("PASS: reference (100,000 ticks), chunk reclamation, negative coordinates, atomic memory limit, collision spawning, ant cap, disabled spawning, unique starts, multi-ant run");
+
+// Grow across the population boundary, then keep simulating at the cap.
+const capped = new AntWorld({ spawn: true, maxAnts: 1500, random: () => .5 });
+capped.ants = [{ x: -1, y: 0, dir: 0 }, { x: 1, y: 0, dir: 2 },
+  ...Array.from({ length: 1497 }, (_, i) => ({ x: 100 + i * 2, y: 100, dir: 0 }))];
+check(capped.step() && capped.ants.length === 1500, "Did not grow to 1,500 ants");
+const before = JSON.stringify(capped.ants);
+for (let i = 0; i < 100; i++) {
+  check(capped.step(), "Simulation stopped at population cap");
+  check(capped.ants.length === 1500 && !capped.limit, "Population cap paused or added ants");
+}
+check(capped.ticks === 101 && JSON.stringify(capped.ants) !== before, "Ants did not keep moving");
+check(new AntWorld({ maxAnts: 9999 }).maxAnts === 1500, "Population ceiling missing");
+console.log("PASS: grows to 1,500 ants, keeps moving at cap, enforces ceiling");
