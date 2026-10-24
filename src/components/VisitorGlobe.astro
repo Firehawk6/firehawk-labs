@@ -1,7 +1,7 @@
 <section class="visitor-globe" aria-labelledby="globe-title">
   <header><div><p>AROUND THE WORLD</p><h2 id="globe-title">Look who stopped by.</h2></div><span class="signal" id="visitor-signal">CONNECTING</span></header>
   <div class="globe-stage">
-    <canvas id="visitor-globe-canvas" aria-label="Rotating globe showing countries with recorded visits"></canvas>
+    <canvas id="visitor-globe-canvas" aria-label="Rotating globe showing approximate regions with recorded visits"></canvas>
     <div class="globe-fallback" id="globe-fallback" hidden>Visitor locations are listed below.</div>
     <button type="button" id="globe-pause" hidden>Pause rotation</button>
   </div>
@@ -11,7 +11,7 @@
     <div><dd id="visits-countries">—</dd><dt>Countries reached</dt></div>
   </dl>
   <p class="visitor-note" id="visitor-note" role="status">Connecting to visitor activity…</p>
-  <details><summary>About these numbers</summary><p>Visits are browsing sessions, counted once per UTC day—not verified unique people. Refreshing or moving between pages in the same tab doesn’t add a visit. Markers represent countries, not exact locations. VPNs can change the location shown. Privacy settings and blockers may prevent counting.</p><p>The collector stores country totals and short-lived random session hashes, not IP addresses.</p></details>
+  <details><summary>About these numbers</summary><p>Visits are browsing sessions, counted once per UTC day—not verified unique people. Refreshing or moving between pages in the same tab doesn’t add a visit. Bright markers group approximate IP locations rounded to half-degree regions. Dimmer country markers include older visits and visits without regional data. VPNs, mobile networks, and satellite connections can place visits far from the person. Privacy settings and blockers may prevent counting.</p><p>The collector stores rounded regional counts, country totals, and short-lived random session hashes, not IP addresses or precise coordinates.</p></details>
   <ul id="visitor-countries" aria-label="Countries with the most recorded visits"></ul>
 </section>
 
@@ -21,9 +21,9 @@
 </script>
 
 <style>
-.visitor-globe { width:100%;border:1px solid var(--border);background:rgba(9,16,12,.6);padding:clamp(18px,2vw,28px); }
+.visitor-globe { width:100%;border:1px solid var(--border);background:rgba(18,15,18,.6);padding:clamp(18px,2vw,28px); }
 header { display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap; }
-header p { color:var(--green);font-size:.7rem;letter-spacing:.12em;margin:0 0 8px; }
+header p { color:var(--accent);font-size:.7rem;letter-spacing:.12em;margin:0 0 8px; }
 h2 { font-size:clamp(1.2rem,2vw,1.6rem);margin:0;letter-spacing:-.04em; }
 .signal { font-size:.62rem;color:var(--muted);letter-spacing:.06em; }
 .globe-stage { position:relative;width:100%;height:clamp(240px,26vw,360px); }
@@ -32,7 +32,7 @@ canvas { display:block;width:100%;height:100%; }
 .globe-fallback { padding:70px 20px;color:var(--muted);text-align:center; }
 button { position:absolute;bottom:8px;right:0;background:var(--background);border:1px solid var(--border);color:var(--muted);padding:8px 10px;cursor:pointer;font-size:.7rem; }
 .visitor-metrics { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:18px 0;margin:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border); }
-dd { color:var(--green);font-size:clamp(1.3rem,2.5vw,2rem);margin:0; }
+dd { color:var(--accent);font-size:clamp(1.3rem,2.5vw,2rem);margin:0; }
 dt { font-size:.65rem;color:var(--muted);margin-top:5px; }
 .visitor-note,details p { color:var(--muted);font: .8rem/1.65 Arial,Helvetica,sans-serif; }
 details { font-size:.75rem;color:var(--muted); } summary { cursor:pointer;min-height:30px; }

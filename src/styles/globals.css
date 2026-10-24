@@ -1,14 +1,14 @@
 :root {
-  --background: #070908;
-  --panel: #0d1210;
-  --panel-hover: #121a16;
-  --border: #203028;
-  --text: #e4eee8;
-  --muted: #9aafa2;
+  --background: #0b0b0d;
+  --panel: #141416;
+  --panel-hover: #1d1c1f;
+  --border: #393236;
+  --text: #f3eeee;
+  --muted: #b9afb2;
   --content-width: 1800px;
   --gutter: clamp(18px, 3vw, 64px);
   --section-space: clamp(48px, 7vw, 88px);
-  --green: #6dff9b;
+  --accent: #ff8b83;
 }
 
 * {
@@ -41,11 +41,11 @@ textarea {
 }
 
 ::selection {
-  background: var(--green);
+  background: var(--accent);
   color: var(--background);
 }
 
-:focus-visible { outline:2px solid var(--green);outline-offset:5px; }
+:focus-visible { outline:2px solid var(--accent);outline-offset:5px; }
 
 body { line-height:1.5; }
 h1,h2,h3,p { overflow-wrap:break-word; }

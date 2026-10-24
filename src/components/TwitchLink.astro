@@ -1,0 +1,9 @@
+<a class="twitch-link" href="/live" data-twitch-link>
+  <span class="signal" aria-hidden="true"></span>
+  <span><strong data-twitch-label>WATCH TWITCH</strong><small>tezzzzaa · come hang out</small></span>
+  <span aria-hidden="true">↗</span>
+</a>
+<script>import '../scripts/twitch-status.js';</script>
+<style>
+.twitch-link{display:inline-flex;align-items:center;gap:14px;min-height:64px;margin-top:20px;padding:12px 18px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);text-decoration:none;transition:border-color .2s,background .2s}.twitch-link:hover{border-color:var(--accent);background:var(--panel-hover)}strong,small{display:block}strong{font-size:.78rem;letter-spacing:.06em}small{margin-top:4px;font: .8rem/1.5 Arial,sans-serif;color:var(--muted)}.signal{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0}.twitch-link[data-live=true]{border-color:var(--accent);background:#261a1d}.twitch-link[data-live=true] strong{color:var(--accent)}.twitch-link[data-live=true] .signal{background:var(--accent);animation:live-pulse 2.4s ease-out infinite}@keyframes live-pulse{0%{box-shadow:0 0 0 0 rgba(255,139,131,.45)}75%,100%{box-shadow:0 0 0 10px rgba(255,139,131,0)}}@media(prefers-reduced-motion:reduce){.signal{animation:none!important}}
+</style>

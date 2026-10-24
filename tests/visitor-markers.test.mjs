@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { visitorMarkers } from '../src/scripts/visitor-markers.mjs';
+const countries={US:{lat:38,lon:-97}};
+assert.deepEqual(visitorMarkers({countries:[{code:'US',count:5}]},countries),[{lat:38,lon:-97,count:5,regional:false}]);
+const data={countries:[{code:'US',count:5}],locations:[{code:'US',lat:36,lon:-87,count:2},{code:'US',lat:34,lon:-118,count:1}]};
+const markers=visitorMarkers(data,countries);
+assert.equal(markers.length,3);assert.equal(markers.reduce((n,m)=>n+m.count,0),5);
+assert.equal(markers[2].count,2);assert.equal(markers[2].regional,false);
+assert.equal(visitorMarkers({...data,locations:[{code:'US',lat:NaN,lon:0,count:1}]},countries).length,1);
+assert.equal(visitorMarkers({...data,countries:[{code:'US',count:3}]},countries).length,2);
+console.log('PASS: legacy fallback, multiple regional dots, no double counting and invalid coordinate rejection');
