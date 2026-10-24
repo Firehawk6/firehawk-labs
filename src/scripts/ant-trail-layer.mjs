@@ -26,6 +26,7 @@ export class AntTrailLayer {
     ctx.fillStyle = background;
     if (full) ctx.fillRect(0, 0, w, h);
     const size = TILE * scale;
+    const level = scale * dpr <= .25 ? 4 : scale * dpr <= .5 ? 2 : 1;
     const minX = Math.floor(-ox / size), maxX = Math.floor((width - ox) / size);
     const minY = Math.floor(-oy / size), maxY = Math.floor((height - oy) / size);
     let drawn = 0;
@@ -37,8 +38,8 @@ export class AntTrailLayer {
       const th = Math.round((oy + (ty + 1) * size) * dpr) - y;
       if (!full) ctx.fillRect(x, y, tw, th);
       if (tile) {
-        const entry = this.cache.get(tile, foreground);
-        ctx.drawImage(this.cache.image, entry.x, entry.y, TILE, TILE, x, y, tw, th);
+        const entry = this.cache.get(tile, foreground, level);
+        ctx.drawImage(this.cache.image, entry.x, entry.y, TILE / level, TILE / level, x, y, tw, th);
       }
       drawn++;
     };

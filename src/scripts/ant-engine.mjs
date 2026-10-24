@@ -29,12 +29,15 @@ export class AntWorld {
     let tile = this.tiles.get(key);
     if (!tile) {
       if (this.tiles.size >= this.maxTiles) { this.limit = true; return false; }
-      tile = { tx, ty, cells: new Uint8Array(TILE * TILE), count: 0, version: 0 };
+      tile = { tx, ty, cells: new Uint8Array(TILE * TILE), coarse2: new Uint8Array(256), coarse4: new Uint8Array(64), count: 0, version: 0 };
       this.tiles.set(key, tile);
     }
     const index = (y - ty * TILE) * TILE + x - tx * TILE;
     const delta = tile.cells[index] ? -1 : 1;
     tile.cells[index] ^= 1;
+    const lx = x - tx * TILE, ly = y - ty * TILE;
+    tile.coarse2[(ly >> 1) * 16 + (lx >> 1)] += delta;
+    tile.coarse4[(ly >> 2) * 8 + (lx >> 2)] += delta;
     tile.count += delta;
     tile.version++;
     this.changed.add(key);

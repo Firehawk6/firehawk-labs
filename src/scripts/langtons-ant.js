@@ -24,6 +24,7 @@ function init() {
   let last = 0, debt = 0, sampleTime = 0, sampleTicks = 0, lastStats = 0;
   let applied = { count: 1, maxAnts: 1500, spawn: false };
   let drag = null;
+  let lastDraw = -Infinity, forceDraw = true;
 
   function status() {
     el("play").textContent = running ? "Pause" : "Play";
@@ -48,7 +49,7 @@ function init() {
   function schedule() {
     if (!frame && visible && !document.hidden) frame = requestAnimationFrame(loop);
   }
-  function change() { dirty = true; schedule(); }
+  function change() { dirty = true; forceDraw = true; schedule(); }
   function center() {
     const ant = world.ants[0];
     ox = width / 2 - (ant.x + .5) * scale;
@@ -67,6 +68,10 @@ function init() {
     for (const ant of world.ants) {
       const x = ox + (ant.x + .5) * scale, y = oy + (ant.y + .5) * scale;
       if (x < -scale || y < -scale || x > width + scale || y > height + scale) continue;
+      if (scale < 1) {
+        ctx.rect(x - .5, y - .5, 1, 1);
+        continue;
+      }
       // Rotate vertices directly and draw all ants in one path.
       const dx = [0, 1, 0, -1][ant.dir], dy = [-1, 0, 1, 0][ant.dir];
       ctx.moveTo(x + dx * s, y + dy * s);
@@ -86,7 +91,9 @@ function init() {
       debt = Math.min(debt + elapsed * rate / 1000, Math.max(1, rate / 10));
       const start = performance.now();
       let steps = 0;
-      while (debt >= 1 && performance.now() - start < 5) {
+      // Bound CPU use by elapsed time, including on high-refresh-rate monitors.
+      const budget = Math.min(3, elapsed * .18);
+      while (debt >= 1 && performance.now() - start < budget) {
         if (!world.step()) { running = false; status(); break; }
         debt--; steps++;
       }
@@ -98,7 +105,11 @@ function init() {
       }
     }
     last = now;
-    if (dirty) draw();
+    // A wide view needs fewer presentation frames, not fewer simulation cells.
+    const interval = scale < 1 ? 1000 / 30 : 1000 / 60;
+    if (dirty && (forceDraw || !running || now - lastDraw >= interval - .5)) {
+      draw(); lastDraw = now; forceDraw = false;
+    }
     stats(now);
     if (running) schedule();
   }

@@ -8,10 +8,10 @@ Ported from commit 435d1b5b48f43f8c5a4d420353c8571c5531b8f5.
 The VM serves static assets; each visitor runs a private simulation in their browser.
 No new Python service, port, database, or Nginx route is needed.
 
-The engine uses sparse 32×32 Uint8Array chunks, removes empty chunks, and pauses before exceeding 65,536 chunks (64 MiB of cell arrays at capacity).
+The engine uses sparse 32×32 Uint8Array chunks, removes empty chunks, and pauses before exceeding 65,536 chunks (64 MiB of exact cell arrays plus 20 MiB of density arrays at capacity).
 Collision spawning retains the original at-most-one-new-ant-per-tick behavior, with an explicit cap (default and maximum 1,500). Reaching the population cap disables spawning only; existing ants continue moving. The separate memory limit still pauses the simulation.
 One-ant starts are centered and deterministic; multi-ant starts use unique positions.
-Rendering visits only visible chunks, caching each chunk raster until changed, with a reusable 8,192-slot RGBA atlas (32 MiB) and one reusable upload buffer. No per-chunk canvases are allocated. A 5 ms simulation budget per animation frame prevents catch-up loops from monopolizing the main thread; speed is a target, not a guarantee.
+Rendering visits only visible chunks, caching each chunk raster until changed, with a reusable 8,192-slot RGBA atlas (32 MiB) and reusable upload buffers. No per-chunk canvases are allocated. A simulation budget of 18% of elapsed frame time, capped at 3 ms per frame, prevents catch-up loops from monopolizing the main thread; speed is a target, not a guarantee.
 Hidden/offscreen simulations suspend. Requested run state resumes when visible.
 There is no persistent save state; image export saves the current viewport.
 
@@ -59,3 +59,21 @@ Regression checks:
 visible chunks beyond atlas capacity, localized mutations, deletion, offscreen
 changes, pan, palette changes and reset. These are operation-count/correctness
 checks, not browser FPS measurements.
+
+
+### Watching the wide view
+
+Below one CSS pixel per cell, presentation is capped at 30 FPS and ant markers
+become one-pixel dots so they do not obscure the trails. Simulation still uses
+exact cell states and the full ant population. Camera interactions render promptly.
+At <= 0.5 device pixels per cell, rendering uses incremental 2×2 density counts;
+at <= 0.25 it uses 4×4 counts. The latter uploads 64 rather than 1,024 pixels per
+changed chunk. Density opacity is square-root boosted to retain faint isolated
+paths; zooming back in restores exact cell rendering. These display summaries
+never feed back into the simulation. Extra density storage is 320 bytes per chunk.
+
+The simulation CPU budget scales with elapsed time to avoid using more CPU on
+120/144 Hz monitors. Actual tick rate can be below the selected target under load.
+`node tests/ant-detail.test.mjs` checks density against exact cells and zoom transitions;
+`node tests/ant-cadence.test.mjs` checks wide-view cadence and CPU scheduling with a
+mock 120 Hz clock. Browser FPS and GPU cost still need real-device validation.
