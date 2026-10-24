@@ -39,3 +39,23 @@ Before deployment, preview and check:
 
 ## Deploy after validation
 Use the normal static build/copy process. Do not rerun or change the visitor collector.
+
+### Large-world rendering
+
+The renderer retains a viewport-sized trail canvas and updates only chunks changed
+since the previous frame. Deleted chunks are cleared too; offscreen changes are
+picked up on the next camera redraw. Pan, zoom, follow, palette changes and resize
+invalidate the viewport. Integer device-pixel boundaries prevent seams at fractional
+zoom. The atlas remains bounded at 32 MiB; the extra viewport layer uses four bytes
+per backing pixel. Ant markers are drawn in one path, independently of the trails.
+
+For long runs, turn off follow to benefit most from retained trails. Camera motion
+still redraws all visible chunks, and 1,500 ants at high tick rates remain limited
+by the visitor's browser/device (the simulation is not running on the VM).
+
+Regression checks:
+`node tests/ant-engine.test.mjs`, `node tests/ant-raster-cache.test.mjs`, and
+`node tests/ant-trail-layer.test.mjs`. The retained-layer test exercises 10,000
+visible chunks beyond atlas capacity, localized mutations, deletion, offscreen
+changes, pan, palette changes and reset. These are operation-count/correctness
+checks, not browser FPS measurements.

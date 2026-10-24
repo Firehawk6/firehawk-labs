@@ -1,5 +1,5 @@
-import { AntWorld, TILE } from "./ant-engine.mjs";
-import { AntRasterCache } from "./ant-raster-cache.mjs";
+import { AntWorld } from "./ant-engine.mjs";
+import { AntTrailLayer } from "./ant-trail-layer.mjs";
 
 const root = document.getElementById("ant-lab");
 if (root) init();
@@ -18,7 +18,7 @@ function init() {
   };
   const speeds = [1, 60, 600, 6000, 30000];
   let world = new AntWorld();
-  const cache = new AntRasterCache(() => document.createElement("canvas"));
+  const trails = new AntTrailLayer(() => document.createElement("canvas"));
   let running = false, visible = true, dirty = true, frame = 0;
   let width = 0, height = 0, dpr = 1, scale = 10, ox = 0, oy = 0;
   let last = 0, debt = 0, sampleTime = 0, sampleTicks = 0, lastStats = 0;
@@ -59,39 +59,22 @@ function init() {
     const colors = palettes[el("theme").value];
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = colors[0];
-    ctx.fillRect(0, 0, width, height);
-    const size = TILE * scale;
-    const minX = Math.floor(-ox / size), maxX = Math.floor((width - ox) / size);
-    const minY = Math.floor(-oy / size), maxY = Math.floor((height - oy) / size);
-    // At wide zoom, scan occupied chunks instead of thousands of empty positions.
-    function* visibleTiles() {
-      const area = (maxX - minX + 1) * (maxY - minY + 1);
-      if (area > world.tiles.size) {
-        for (const [key, tile] of world.tiles) {
-          const [tx, ty] = key.split(",").map(Number);
-          if (tx >= minX && tx <= maxX && ty >= minY && ty <= maxY) yield { tx, ty, tile };
-        }
-      } else {
-        for (let ty = minY; ty <= maxY; ty++) for (let tx = minX; tx <= maxX; tx++) {
-          const tile = world.tiles.get(tx + "," + ty);
-          if (tile) yield { tx, ty, tile };
-        }
-      }
-    }
-    for (const { tx, ty, tile } of visibleTiles()) {
-      const entry = cache.get(tile, colors[1]);
-      ctx.drawImage(cache.image, entry.x, entry.y, TILE, TILE, ox + tx * size, oy + ty * size, size, size);
-    }
+    trails.update(world, { width, height, dpr, scale, ox, oy, background: colors[0], foreground: colors[1] });
+    ctx.drawImage(trails.image, 0, 0, width, height);
     ctx.fillStyle = colors[2];
+    ctx.beginPath();
+    const s = Math.max(3, scale * .42);
     for (const ant of world.ants) {
       const x = ox + (ant.x + .5) * scale, y = oy + (ant.y + .5) * scale;
       if (x < -scale || y < -scale || x > width + scale || y > height + scale) continue;
-      ctx.save(); ctx.translate(x, y); ctx.rotate(ant.dir * Math.PI / 2);
-      const s = Math.max(3, scale * .42);
-      ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s * .8, s); ctx.lineTo(-s * .8, s);
-      ctx.closePath(); ctx.fill(); ctx.restore();
+      // Rotate vertices directly and draw all ants in one path.
+      const dx = [0, 1, 0, -1][ant.dir], dy = [-1, 0, 1, 0][ant.dir];
+      ctx.moveTo(x + dx * s, y + dy * s);
+      ctx.lineTo(x - dx * s - dy * s * .8, y - dy * s + dx * s * .8);
+      ctx.lineTo(x - dx * s + dy * s * .8, y - dy * s - dx * s * .8);
+      ctx.closePath();
     }
+    ctx.fill();
     dirty = false;
   }
   function loop(now) {
@@ -121,7 +104,7 @@ function init() {
   }
   function reset() {
     running = false; debt = 0; last = 0;
-    world = new AntWorld(applied); cache.clear();
+    world = new AntWorld(applied); trails.invalidate();
     sampleTime = performance.now(); sampleTicks = 0;
     scale = applied.count === 1 ? 10 : 6;
     center(); status(); stats(performance.now(), true);
@@ -137,7 +120,7 @@ function init() {
     applied = { count, maxAnts, spawn: el("spawn").checked }; reset();
   };
   el("speed").oninput = () => { el("speed-value").textContent = speeds[Number(el("speed").value)].toLocaleString() + " ticks/s"; debt = 0; };
-  el("theme").onchange = () => { cache.clear(); change(); };
+  el("theme").onchange = () => { trails.invalidate(); change(); };
   el("follow").onchange = () => { if (el("follow").checked) center(); };
   el("center").onclick = center;
   function zoom(factor, x = width / 2, y = height / 2) {

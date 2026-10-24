@@ -3,6 +3,7 @@ export const TILE = 32;
 export class AntWorld {
   constructor({ count = 1, maxAnts = 1500, spawn = false, random = Math.random, maxTiles = 65536 } = {}) {
     this.tiles = new Map();
+    this.changed = new Set();
     this.ants = [];
     this.ticks = 0;
     this.active = 0;
@@ -28,7 +29,7 @@ export class AntWorld {
     let tile = this.tiles.get(key);
     if (!tile) {
       if (this.tiles.size >= this.maxTiles) { this.limit = true; return false; }
-      tile = { cells: new Uint8Array(TILE * TILE), count: 0, version: 0 };
+      tile = { tx, ty, cells: new Uint8Array(TILE * TILE), count: 0, version: 0 };
       this.tiles.set(key, tile);
     }
     const index = (y - ty * TILE) * TILE + x - tx * TILE;
@@ -36,6 +37,7 @@ export class AntWorld {
     tile.cells[index] ^= 1;
     tile.count += delta;
     tile.version++;
+    this.changed.add(key);
     this.active += delta;
     if (tile.count === 0) this.tiles.delete(key);
     return true;
@@ -43,12 +45,14 @@ export class AntWorld {
   step() {
     if (this.limit) return false;
     // Preflight allocation so a memory-limit pause never leaves a partial tick.
-    const missing = new Set();
-    for (const ant of this.ants) {
-      const key = Math.floor(ant.x / TILE) + "," + Math.floor(ant.y / TILE);
-      if (!this.tiles.has(key)) missing.add(key);
+    if (this.tiles.size + this.ants.length > this.maxTiles) {
+      const missing = new Set();
+      for (const ant of this.ants) {
+        const key = Math.floor(ant.x / TILE) + "," + Math.floor(ant.y / TILE);
+        if (!this.tiles.has(key)) missing.add(key);
+      }
+      if (this.tiles.size + missing.size > this.maxTiles) { this.limit = true; return false; }
     }
-    if (this.tiles.size + missing.size > this.maxTiles) { this.limit = true; return false; }
     for (const ant of this.ants) {
       const state = this.get(ant.x, ant.y);
       this.flip(ant.x, ant.y);
