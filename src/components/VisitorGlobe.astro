@@ -1,7 +1,7 @@
 <section class="visitor-globe" aria-labelledby="globe-title">
   <header><div><p>AROUND THE WORLD</p><h2 id="globe-title">Look who stopped by.</h2></div><span class="signal" id="visitor-signal">CONNECTING</span></header>
   <div class="globe-stage">
-    <canvas id="visitor-globe-canvas" aria-label="Rotating globe showing countries with recorded visits"></canvas>
+    <canvas id="visitor-globe-canvas" aria-label="Rotating globe showing approximate regions with recorded visits"></canvas>
     <div class="globe-fallback" id="globe-fallback" hidden>Visitor locations are listed below.</div>
     <button type="button" id="globe-pause" hidden>Pause rotation</button>
   </div>
@@ -11,7 +11,7 @@
     <div><dd id="visits-countries">—</dd><dt>Countries reached</dt></div>
   </dl>
   <p class="visitor-note" id="visitor-note" role="status">Connecting to visitor activity…</p>
-  <details><summary>About these numbers</summary><p>Visits are browsing sessions, counted once per UTC day—not verified unique people. Refreshing or moving between pages in the same tab doesn’t add a visit. Markers represent countries, not exact locations. VPNs can change the location shown. Privacy settings and blockers may prevent counting.</p><p>The collector stores country totals and short-lived random session hashes, not IP addresses.</p></details>
+  <details><summary>About these numbers</summary><p>Visits are browsing sessions, counted once per UTC day—not verified unique people. Refreshing or moving between pages in the same tab doesn’t add a visit. Bright markers group approximate IP locations rounded to half-degree regions. Dimmer country markers include older visits and visits without regional data. VPNs, mobile networks, and satellite connections can place visits far from the person. Privacy settings and blockers may prevent counting.</p><p>The collector stores rounded regional counts, country totals, and short-lived random session hashes, not IP addresses or precise coordinates.</p></details>
   <ul id="visitor-countries" aria-label="Countries with the most recorded visits"></ul>
 </section>
 

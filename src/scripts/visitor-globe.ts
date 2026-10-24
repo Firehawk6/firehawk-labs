@@ -1,4 +1,5 @@
-interface VisitorData { total: number; today: number; countries: Array<{ code: string; count: number }>; since: string; }
+import { visitorMarkers } from "./visitor-markers.mjs";
+interface VisitorData { total: number; today: number; countries: Array<{ code: string; count: number }>; since: string; locations?: Array<{ code: string; lat: number; lon: number; count: number }>; }
 interface Country { name: string; lat: number; lon: number; }
 export async function mountVisitorGlobe() {
   const canvas = document.querySelector<HTMLCanvasElement>("#visitor-globe-canvas");
@@ -25,7 +26,7 @@ export async function mountVisitorGlobe() {
         document.getElementById(id)!.textContent = value.toLocaleString();
       }
       signal.textContent = "RECORDED ACTIVITY";
-      note.textContent = data.total ? `Tracking since ${data.since}. Country totals refresh every minute.` : "No visits recorded yet. The first visits will light up the globe.";
+      note.textContent = data.total ? `Tracking since ${data.since}. Approximate locations refresh every minute.` : "No visits recorded yet. The first visits will light up the globe.";
       const list = document.getElementById("visitor-countries")!;
       list.replaceChildren(...data.countries.slice(0, 5).map(item => {
         const li = document.createElement("li");
@@ -54,7 +55,7 @@ export async function mountVisitorGlobe() {
     document.removeEventListener("visibilitychange", refresh);
   }, { once: true });
   try {
-    const { BufferGeometry, Float32BufferAttribute, Group, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } = await import("three");
+    const { BufferGeometry, Float32BufferAttribute, Group, InstancedMesh, Object3D, Color, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } = await import("three");
     const response = await fetch("/data/world-outline.json", { signal: controller.signal });
     if (!response.ok) throw new Error("Map unavailable");
     const outlines: number[][][] = await response.json();
@@ -81,16 +82,24 @@ export async function mountVisitorGlobe() {
     const gridGeometry = new BufferGeometry();gridGeometry.setAttribute("position",new Float32BufferAttribute(gridPoints,3));
     globe.add(new LineSegments(gridGeometry,new LineBasicMaterial({color:0x654248,transparent:true,opacity:.4})));
     const dots = new Group();globe.add(dots);
-    const dotGeometry = new SphereGeometry(.018, 12, 8);
-    const dotMaterial = new MeshBasicMaterial({color:0xffd0ba});
+    const dotGeometry = new SphereGeometry(.010, 10, 6);
+    const dotMaterial = new MeshBasicMaterial({color:0xffffff});
+    let instances: InstanceType<typeof InstancedMesh> | undefined;
     updateMarkers = data => {
-      dots.clear();
-      for (const item of data.countries) {
-        const country = countries[item.code];if (!country || item.count < 1) continue;
-        const dot = new Mesh(dotGeometry,dotMaterial);
-        dot.position.copy(position(country.lat,country.lon,1.025));
-        dot.scale.setScalar(Math.min(2.4,1+Math.log10(item.count)*.3));dots.add(dot);
-      }
+      if (instances) { dots.remove(instances); instances.dispose(); instances = undefined; }
+      const markers = visitorMarkers(data, countries);
+      if (!markers.length) return;
+      instances = new InstancedMesh(dotGeometry, dotMaterial, markers.length);
+      const transform = new Object3D();
+      markers.forEach((item, i) => {
+        transform.position.copy(position(item.lat, item.lon, 1.018));
+        transform.scale.setScalar(Math.min(2.8, 1 + Math.log10(item.count) * .4));
+        transform.updateMatrix(); instances!.setMatrixAt(i, transform.matrix);
+        instances!.setColorAt(i, new Color(item.regional ? 0xffd0ba : 0x94635e));
+      });
+      instances.instanceMatrix.needsUpdate = true;
+      if (instances.instanceColor) instances.instanceColor.needsUpdate = true;
+      dots.add(instances);
     };
     if (latest) updateMarkers(latest);
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -121,7 +130,7 @@ export async function mountVisitorGlobe() {
       cancelAnimationFrame(frame);observer.disconnect();intersection.disconnect();
       motion.removeEventListener("change",onMotion);document.removeEventListener("visibilitychange",onVisible);button.removeEventListener("click",toggle);
       scene.traverse(object=>{if(object instanceof Mesh || object instanceof LineSegments){object.geometry.dispose();const materials=Array.isArray(object.material)?object.material:[object.material];materials.forEach(m=>m.dispose());}});
-      dotGeometry.dispose();dotMaterial.dispose();renderer.dispose();
+      instances?.dispose();dotGeometry.dispose();dotMaterial.dispose();renderer.dispose();
     };
   } catch {
     canvas.hidden=true;document.getElementById("globe-fallback")!.hidden=false;

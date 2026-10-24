@@ -1,5 +1,6 @@
-"""Country-only visit aggregates. Run behind the supplied Nginx configuration."""
+"""Coarse location and country visit aggregates. Run behind the supplied Nginx configuration."""
 import hashlib
+import math
 import json
 import os
 import re
@@ -28,6 +29,7 @@ def connect():
       INSERT OR IGNORE INTO sort_totals VALUES(1,0);
       CREATE TABLE IF NOT EXISTS sessions (day TEXT, token TEXT, PRIMARY KEY(day,token));
       CREATE TABLE IF NOT EXISTS daily (day TEXT PRIMARY KEY, visits INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS locations (country TEXT, lat REAL, lon REAL, visits INTEGER NOT NULL, PRIMARY KEY(country,lat,lon));
       CREATE TABLE IF NOT EXISTS countries (code TEXT PRIMARY KEY, visits INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS totals (id INTEGER PRIMARY KEY CHECK(id=1), visits INTEGER NOT NULL, since TEXT NOT NULL);
     ''')
@@ -51,7 +53,8 @@ def stats():
         total, since = db.execute('SELECT visits,since FROM totals WHERE id=1').fetchone()
         row = db.execute('SELECT visits FROM daily WHERE day=?', (today,)).fetchone()
         countries = [{'code':code,'count':count} for code,count in db.execute('SELECT code,visits FROM countries ORDER BY visits DESC,code')]
-        return jsonify(total=total, today=row[0] if row else 0, countries=countries, since=since)
+        locations = [{'code':code, 'lat':lat, 'lon':lon, 'count':count} for code,lat,lon,count in db.execute('SELECT country,lat,lon,visits FROM locations ORDER BY visits DESC,country,lat,lon LIMIT 2000')]
+        return jsonify(total=total, today=row[0] if row else 0, countries=countries, locations=locations, since=since)
     finally:
         db.close()
 
@@ -73,6 +76,17 @@ def visit():
     country = request.headers.get('CF-IPCountry','').upper()
     if not re.fullmatch('[A-Z]{2}',country) or country in ('XX','T1'):
         country = None
+    location = None
+    # Trust only headers delivered through the configured Cloudflare Tunnel.
+    # Round before persistence; never store IPs or the original coordinates.
+    if country:
+        try:
+            lat = float(request.headers.get('CF-IPLatitude', ''))
+            lon = float(request.headers.get('CF-IPLongitude', ''))
+            if math.isfinite(lat) and math.isfinite(lon) and -90 <= lat <= 90 and -180 <= lon <= 180:
+                location = (math.floor(lat * 2 + .5) / 2, (math.floor(lon * 2 + .5) / 2 + 180) % 360 - 180)
+        except (ValueError, TypeError):
+            pass
     now = datetime.now(timezone.utc).date()
     day = now.isoformat()
     token = hashlib.sha256((day + session).encode()).hexdigest()
@@ -85,6 +99,8 @@ def visit():
                 db.execute('INSERT INTO daily VALUES(?,1) ON CONFLICT(day) DO UPDATE SET visits=visits+1',(day,))
                 if country:
                     db.execute('INSERT INTO countries VALUES(?,1) ON CONFLICT(code) DO UPDATE SET visits=visits+1',(country,))
+                if location is not None:
+                    db.execute('INSERT INTO locations VALUES(?,?,?,1) ON CONFLICT(country,lat,lon) DO UPDATE SET visits=visits+1', (country, *location))
             db.execute('DELETE FROM sessions WHERE day < ?',((now-timedelta(days=1)).isoformat(),))
             db.execute('DELETE FROM daily WHERE day < ?',((now-timedelta(days=400)).isoformat(),))
         return jsonify(recorded=added)
